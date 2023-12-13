@@ -9,6 +9,7 @@ Game::Game()
     nextBlock = GetRandomBlock();
     gameOver = false;
     score = 0;
+    linesCleared = 0;
     InitAudioDevice();
     music = LoadMusicStream("Sounds/music.mp3");
     PlayMusicStream(music);
@@ -44,17 +45,17 @@ std::vector<Block> Game::GetAllBlocks()
 void Game::Draw()
 {
     grid.Draw();
-    currentBlock.Draw(11, 11);
+    currentBlock.Draw(489, 146);
     switch (nextBlock.id)
     {
     case 3:
-        nextBlock.Draw(255, 290);
+        nextBlock.Draw(838, 231);
         break;
     case 4:
-        nextBlock.Draw(255, 280);
+        nextBlock.Draw(838, 221);
         break;
     default:
-        nextBlock.Draw(270, 270);
+        nextBlock.Draw(853, 211);
         break;
     }
 }
@@ -185,6 +186,7 @@ void Game::LockBlock()
     {
         PlaySound(clearSound);
         UpdateScore(rowsCleared, 0);
+        UpdateLinesCleared(rowsCleared);
     }
 }
 
@@ -208,6 +210,7 @@ void Game::Reset()
     currentBlock = GetRandomBlock();
     nextBlock = GetRandomBlock();
     score = 0;
+    linesCleared = 0;
 }
 
 void Game::UpdateScore(int linesCleared, int moveDownPoints)
@@ -228,4 +231,9 @@ void Game::UpdateScore(int linesCleared, int moveDownPoints)
     }
 
     score += moveDownPoints;
+}
+
+void Game::UpdateLinesCleared(int linesCleared)
+{
+    this->linesCleared += linesCleared;
 }

@@ -14,7 +14,7 @@ public:
     bool gameOver;
     int score;
     Music music;
-
+    int linesCleared;
 private:
     void MoveBlockLeft();
     void MoveBlockRight();
@@ -26,6 +26,7 @@ private:
     bool BlockFits();
     void Reset();
     void UpdateScore(int linesCleared, int moveDownPoints);
+    void UpdateLinesCleared(int linesCleared);
     Grid grid;
     std::vector<Block> blocks;
     Block currentBlock;
