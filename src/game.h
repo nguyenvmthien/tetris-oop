@@ -1,7 +1,7 @@
 #pragma once
 #include "grid.h"
 #include "blocks.cpp"
-
+#include <string>
 class Game
 {
 public:
@@ -15,6 +15,8 @@ public:
     int score;
     Music music;
     int linesCleared;
+    int timePlayed;
+    std::string namePlayer;
 private:
     void MoveBlockLeft();
     void MoveBlockRight();
@@ -25,8 +27,9 @@ private:
     void LockBlock();
     bool BlockFits();
     void Reset();
-    void UpdateScore(int linesCleared, int moveDownPoints);
+    void UpdateScore(int linesCleared);
     void UpdateLinesCleared(int linesCleared);
+    void WriteResultToFile();
     Grid grid;
     std::vector<Block> blocks;
     Block currentBlock;
