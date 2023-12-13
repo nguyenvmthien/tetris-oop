@@ -10,11 +10,12 @@ Game::Game()
     gameOver = false;
     score = 0;
     linesCleared = 0;
+    timePlayed = 0;
     InitAudioDevice();
-    music = LoadMusicStream("Sounds/music.mp3");
+    music = LoadMusicStream("sounds/music.mp3");
     PlayMusicStream(music);
-    rotateSound = LoadSound("Sounds/rotate.mp3");
-    clearSound = LoadSound("Sounds/clear.mp3");
+    rotateSound = LoadSound("sounds/rotate.mp3");
+    clearSound = LoadSound("sounds/clear.mp3");
 }
 
 Game::~Game()
@@ -63,7 +64,7 @@ void Game::Draw()
 void Game::HandleInput()
 {
     int keyPressed = GetKeyPressed();
-    if (gameOver && keyPressed != 0)
+    if (gameOver && keyPressed == KEY_R)
     {
         gameOver = false;
         Reset();
@@ -78,7 +79,6 @@ void Game::HandleInput()
         break;
     case KEY_DOWN:
         MoveBlockDown();
-        UpdateScore(0, 1);
         break;
     case KEY_UP:
         RotateBlock();
@@ -179,13 +179,15 @@ void Game::LockBlock()
     if (BlockFits() == false)
     {
         gameOver = true;
+        timePlayed = GetTime();
+        WriteResultToFile();
     }
     nextBlock = GetRandomBlock();
     int rowsCleared = grid.ClearFullRows();
     if (rowsCleared > 0)
     {
         PlaySound(clearSound);
-        UpdateScore(rowsCleared, 0);
+        UpdateScore(rowsCleared);
         UpdateLinesCleared(rowsCleared);
     }
 }
@@ -211,29 +213,28 @@ void Game::Reset()
     nextBlock = GetRandomBlock();
     score = 0;
     linesCleared = 0;
+    timePlayed = 0;
 }
 
-void Game::UpdateScore(int linesCleared, int moveDownPoints)
+void Game::UpdateScore(int linesCleared)
 {
-    switch (linesCleared)
-    {
-    case 1:
-        score += 100;
-        break;
-    case 2:
-        score += 300;
-        break;
-    case 3:
-        score += 500;
-        break;
-    default:
-        break;
-    }
-
-    score += moveDownPoints;
+    score += linesCleared * 100;
 }
 
 void Game::UpdateLinesCleared(int linesCleared)
 {
     this->linesCleared += linesCleared;
+}
+
+void Game::WriteResultToFile()
+{
+    FILE *file = fopen("scores.txt", "a");
+    if (file == NULL)
+    {
+        return;
+    }
+    fprintf(file, "%s-", namePlayer.c_str());
+    fprintf(file, "%d-", score);
+    fprintf(file, "%d\n", timePlayed);
+    fclose(file);
 }
