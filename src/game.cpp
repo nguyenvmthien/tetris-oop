@@ -82,6 +82,9 @@ void Game::HandleInput()
     case KEY_UP:
         RotateBlock();
         break;
+    case KEY_SPACE:
+        MoveBlockDownNow();
+        break;
     }
 }
 
@@ -122,6 +125,19 @@ void Game::MoveBlockDown()
     }
 }
 
+void Game::MoveBlockDownNow() 
+{
+    while(!gameOver) 
+    {
+        currentBlock.Move(1, 0);
+        if (IsBlockOutside() || BlockFits() == false)
+        {
+            currentBlock.Move(-1, 0);
+            LockBlock();
+            break;
+        }
+    }
+}
 bool Game::IsBlockOutside()
 {
     std::vector<Position> tiles = currentBlock.GetCellPositions();
