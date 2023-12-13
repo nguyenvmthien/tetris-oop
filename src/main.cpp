@@ -18,10 +18,10 @@ bool EventTriggered(double interval)
 
 int main()
 {
-    InitWindow(500, 620, "raylib Tetris");
+    InitWindow(1200, 800, "Tetris");
     SetTargetFPS(60);
 
-    Font font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
+    Font font = LoadFontEx("Font/Inter-Bold.ttf", 64, 0, 0);
 
     Game game = Game();
 
@@ -35,24 +35,28 @@ int main()
         }
 
         BeginDrawing();
-        ClearBackground(darkBlue);
-        DrawTextEx(font, "Score", {365, 15}, 38, 2, WHITE);
-        DrawTextEx(font, "Next", {370, 175}, 38, 2, WHITE);
+        ClearBackground(Color{43, 39, 57, 1});
+        DrawTextEx(font, "Score", {839, 417}, 40, 5, PINK);
+        DrawTextEx(font, "Next", {833, 99}, 40, 5, PINK);
+        DrawTextEx(font, "Line", {370, 460}, 40, 5, PINK);
         if (game.gameOver)
         {
-            DrawTextEx(font, "GAME OVER", {320, 450}, 38, 2, WHITE);
+            DrawTextEx(font, "GAME OVER", {150, 350}, 50, 5, PINK);
         }
-        DrawRectangleRounded({320, 55, 170, 60}, 0.3, 6, lightBlue);
 
+        DrawRectangleRounded({863, 482, 250, 100}, 1, 6, lightBlue);
         char scoreText[10];
         sprintf(scoreText, "%d", game.score);
         Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
+        DrawTextEx(font, scoreText, {863 + (250 - textSize.x) / 2, 493}, 40, 5, WHITE);
 
-        DrawTextEx(font, scoreText, {320 + (170 - textSize.x) / 2, 65}, 38, 2, WHITE);
-        DrawRectangleRounded({320, 215, 170, 180}, 0.3, 6, lightBlue);
+        char linesClearedText[10]; 
+        sprintf(linesClearedText, "%d", game.linesCleared);
+        DrawTextEx(font, linesClearedText, {400, 511}, 40, 5, WHITE);
+
+        DrawRectangleRounded({863, 146, 250, 200}, 0.5, 6, lightBlue);
         game.Draw();
         EndDrawing();
-    } 
-
+    }
     CloseWindow();
 }
