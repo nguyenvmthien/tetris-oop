@@ -46,7 +46,20 @@ std::vector<Block> Game::GetAllBlocks()
 void Game::Draw()
 {
     grid.Draw();
+    // Draw the shadow of the current block
+    Block shadowBlock = currentBlock; // Create a copy of the current block
+    while (BlockFits(shadowBlock))
+    {
+        shadowBlock.Move(1, 0); // Move the shadow block down
+    }
+    shadowBlock.Move(-1, 0); // Adjust the position
+
+    // Draw the shadow block with a semi-transparent color
+    shadowBlock.Draw(489, 146, Fade(GRAY, 0.5f));
+
+    // Draw the actual current block
     currentBlock.Draw(489, 146);
+
     switch (nextBlock.id)
     {
     case 3:
@@ -195,6 +208,19 @@ void Game::LockBlock()
 bool Game::BlockFits()
 {
     std::vector<Position> tiles = currentBlock.GetCellPositions();
+    for (Position item : tiles)
+    {
+        if (grid.IsCellEmpty(item.row, item.column) == false)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Game::BlockFits(Block block)
+{
+    std::vector<Position> tiles = block.GetCellPositions();
     for (Position item : tiles)
     {
         if (grid.IsCellEmpty(item.row, item.column) == false)
