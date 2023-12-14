@@ -477,7 +477,7 @@ void Game::Home()
         DrawTexture(tetrisImage, 350, 100, WHITE);
         DrawTextEx(font, "Enter your name", {200, 400}, 40, 5, PINK);
         DrawTextEx(font, "Press Enter to start", {200, 500}, 40, 5, PINK);
-        DrawTextEx(font, "Press H for help", {200, 600}, 40, 5, PINK);
+        DrawTextEx(font, "Press Tab for help", {200, 600}, 40, 5, PINK);
 
         if (IsKeyPressed(KEY_TAB))
         {
