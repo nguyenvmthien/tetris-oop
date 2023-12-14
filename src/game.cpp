@@ -11,6 +11,8 @@ Game::Game()
     score = 0;
     linesCleared = 0;
     timePlayed = 0;
+    isReady = 0;
+    namePlayer = "";
     InitAudioDevice();
     music = LoadMusicStream("sounds/music.mp3");
     PlayMusicStream(music);
@@ -139,9 +141,9 @@ void Game::MoveBlockDown()
     }
 }
 
-void Game::MoveBlockDownNow()
+void Game::MoveBlockDownNow() 
 {
-    while (!gameOver)
+    while(!gameOver) 
     {
         currentBlock.Move(1, 0);
         if (IsBlockOutside() || BlockFits() == false)
@@ -150,20 +152,6 @@ void Game::MoveBlockDownNow()
             LockBlock();
             break;
         }
-    }
-}
-void Game::HuongDan()
-{
-    while (!IsKeyPressed(KEY_ENTER))
-    {
-        Image image = LoadImage("img/huongdanchoi.png");
-        Texture2D huongdanImage = LoadTextureFromImage(image);
-        UnloadImage(image);
-        BeginDrawing();
-        ClearBackground(Color{43, 39, 57, 1});
-        DrawTexture(huongdanImage, 0, 0, WHITE);
-        EndDrawing();
-        UnloadTexture(huongdanImage);
     }
 }
 bool Game::IsBlockOutside()
@@ -254,6 +242,7 @@ void Game::Reset()
     score = 0;
     linesCleared = 0;
     timePlayed = 0;
+    isReady = 0;
 }
 
 void Game::UpdateScore(int linesCleared)
@@ -268,16 +257,31 @@ void Game::UpdateLinesCleared(int linesCleared)
 
 void Game::WriteResultToFile()
 {
-    FILE *file = fopen("scores.txt", "a");
-    if (file == NULL)
-    {
-        return;
-    }
-    if (!namePlayer.empty())
-    {
+    // if (namePlayer != "")
+    // {
+        FILE *file = fopen("scores.txt", "a");
+        if (file == NULL)
+        {
+            return;
+        }
         fprintf(file, "%s-", namePlayer.c_str());
         fprintf(file, "%d-", score);
         fprintf(file, "%d\n", timePlayed);
+        fclose(file);
+    // }
+}
+
+void Game::HuongDan()
+{
+    while (!IsKeyPressed(KEY_ENTER) )
+    {
+        Image image = LoadImage("img/huongdanchoi.png");
+        Texture2D huongdanImage = LoadTextureFromImage(image);
+        UnloadImage(image);
+        BeginDrawing();
+        ClearBackground(Color{43, 39, 57, 1});
+        DrawTexture(huongdanImage, 100, 135, WHITE);
+        EndDrawing();
+        UnloadTexture(huongdanImage);
     }
-    fclose(file);
 }

@@ -14,6 +14,7 @@ public:
     void HuongDan();
     bool gameOver;
     int score;
+    int isReady;
     Music music;
     int linesCleared;
     int timePlayed;
