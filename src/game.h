@@ -17,6 +17,7 @@ public:
     int linesCleared;
     int timePlayed;
     std::string namePlayer;
+    int isReady;
 private:
     void MoveBlockLeft();
     void MoveBlockRight();

@@ -11,6 +11,7 @@ Game::Game()
     score = 0;
     linesCleared = 0;
     timePlayed = 0;
+    isReady = 0;
     InitAudioDevice();
     music = LoadMusicStream("sounds/music.mp3");
     PlayMusicStream(music);
@@ -214,6 +215,7 @@ void Game::Reset()
     score = 0;
     linesCleared = 0;
     timePlayed = 0;
+    isReady = 0;
 }
 
 void Game::UpdateScore(int linesCleared)

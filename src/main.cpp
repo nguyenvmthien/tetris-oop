@@ -107,7 +107,6 @@ int main()
     Game game = Game();
     Color background = {43, 39, 57, 1};
 
-    int isReady = 0;
     float numPosX = W/2 + 20;
     float readyPosX = W/2 - 70;
 
@@ -117,9 +116,11 @@ int main()
         ClearBackground(background);
         UpdateMusicStream(game.music);
 
-        if (isReady < 300)
-            GetReady(isReady, numPosX, readyPosX, font, background);
-        else 
+        if (game.isReady < 300)
+        {
+            GetReady(game.isReady, numPosX, readyPosX, font, background);
+        }
+        else
         {
             game.HandleInput();
             if (EventTriggered(updateInterval(game)))
