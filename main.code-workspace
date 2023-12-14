@@ -59,7 +59,9 @@
 			"iterator": "cpp",
 			"numeric": "cpp",
 			"random": "cpp",
-			"numbers": "cpp"
+			"numbers": "cpp",
+			"xlocinfo": "cpp",
+			"xstring": "cpp"
 		},
 		"git.autoRepositoryDetection": false,
 		"git.enabled": false

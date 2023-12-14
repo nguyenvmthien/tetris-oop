@@ -46,7 +46,20 @@ std::vector<Block> Game::GetAllBlocks()
 void Game::Draw()
 {
     grid.Draw();
+    // Draw the shadow of the current block
+    Block shadowBlock = currentBlock; // Create a copy of the current block
+    while (BlockFits(shadowBlock))
+    {
+        shadowBlock.Move(1, 0); // Move the shadow block down
+    }
+    shadowBlock.Move(-1, 0); // Adjust the position
+
+    // Draw the shadow block with a semi-transparent color
+    shadowBlock.Draw(489, 146, Fade(GRAY, 0.5f));
+
+    // Draw the actual current block
     currentBlock.Draw(489, 146);
+
     switch (nextBlock.id)
     {
     case 3:
@@ -126,9 +139,9 @@ void Game::MoveBlockDown()
     }
 }
 
-void Game::MoveBlockDownNow() 
+void Game::MoveBlockDownNow()
 {
-    while(!gameOver) 
+    while (!gameOver)
     {
         currentBlock.Move(1, 0);
         if (IsBlockOutside() || BlockFits() == false)
@@ -137,6 +150,20 @@ void Game::MoveBlockDownNow()
             LockBlock();
             break;
         }
+    }
+}
+void Game::HuongDan()
+{
+    while (!IsKeyPressed(KEY_ENTER))
+    {
+        Image image = LoadImage("img/huongdanchoi.png");
+        Texture2D huongdanImage = LoadTextureFromImage(image);
+        UnloadImage(image);
+        BeginDrawing();
+        ClearBackground(Color{43, 39, 57, 1});
+        DrawTexture(huongdanImage, 0, 0, WHITE);
+        EndDrawing();
+        UnloadTexture(huongdanImage);
     }
 }
 bool Game::IsBlockOutside()
@@ -205,6 +232,19 @@ bool Game::BlockFits()
     return true;
 }
 
+bool Game::BlockFits(Block block)
+{
+    std::vector<Position> tiles = block.GetCellPositions();
+    for (Position item : tiles)
+    {
+        if (grid.IsCellEmpty(item.row, item.column) == false)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Game::Reset()
 {
     grid.Initialize();
@@ -233,8 +273,11 @@ void Game::WriteResultToFile()
     {
         return;
     }
-    fprintf(file, "%s-", namePlayer.c_str());
-    fprintf(file, "%d-", score);
-    fprintf(file, "%d\n", timePlayed);
+    if (!namePlayer.empty())
+    {
+        fprintf(file, "%s-", namePlayer.c_str());
+        fprintf(file, "%d-", score);
+        fprintf(file, "%d\n", timePlayed);
+    }
     fclose(file);
 }

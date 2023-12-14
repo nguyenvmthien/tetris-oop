@@ -11,12 +11,14 @@ public:
     void HandleInput();
     void MoveBlockDown();
     void MoveBlockDownNow();
+    void HuongDan();
     bool gameOver;
     int score;
     Music music;
     int linesCleared;
     int timePlayed;
     std::string namePlayer;
+
 private:
     void MoveBlockLeft();
     void MoveBlockRight();
@@ -26,6 +28,7 @@ private:
     void RotateBlock();
     void LockBlock();
     bool BlockFits();
+    bool BlockFits(Block block);
     void Reset();
     void UpdateScore(int linesCleared);
     void UpdateLinesCleared(int linesCleared);
