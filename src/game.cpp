@@ -48,12 +48,11 @@ void Game::Draw()
     grid.Draw();
     // Draw the shadow of the current block
     Block shadowBlock = currentBlock; // Create a copy of the current block
-    while (BlockFits(shadowBlock))
+    while (BlockFits(shadowBlock) && !IsBlockOutside(shadowBlock))
     {
-        shadowBlock.Move(1, 0); // Move the shadow block down
+        shadowBlock.Move(1, 0);
     }
-    shadowBlock.Move(-1, 0); // Adjust the position
-
+    shadowBlock.Move(-1, 0);
     // Draw the shadow block with a semi-transparent color
     shadowBlock.Draw(489, 146, Fade(GRAY, 0.5f));
 
@@ -104,10 +103,11 @@ void Game::HandleInput()
 
 void Game::MoveBlockLeft()
 {
+    Block shadowBlock = currentBlock; // Create a copy of the current block
     if (!gameOver)
     {
         currentBlock.Move(0, -1);
-        if (IsBlockOutside() || BlockFits() == false)
+        if (IsBlockOutside(currentBlock) || BlockFits(currentBlock) == false)
         {
             currentBlock.Move(0, 1);
         }
@@ -119,7 +119,7 @@ void Game::MoveBlockRight()
     if (!gameOver)
     {
         currentBlock.Move(0, 1);
-        if (IsBlockOutside() || BlockFits() == false)
+        if (IsBlockOutside(currentBlock) || BlockFits(currentBlock) == false)
         {
             currentBlock.Move(0, -1);
         }
@@ -131,7 +131,7 @@ void Game::MoveBlockDown()
     if (!gameOver)
     {
         currentBlock.Move(1, 0);
-        if (IsBlockOutside() || BlockFits() == false)
+        if (IsBlockOutside(currentBlock) || BlockFits(currentBlock) == false)
         {
             currentBlock.Move(-1, 0);
             LockBlock();
@@ -139,12 +139,12 @@ void Game::MoveBlockDown()
     }
 }
 
-void Game::MoveBlockDownNow() 
+void Game::MoveBlockDownNow()
 {
-    while(!gameOver) 
+    while (!gameOver)
     {
         currentBlock.Move(1, 0);
-        if (IsBlockOutside() || BlockFits() == false)
+        if (IsBlockOutside(currentBlock) || BlockFits(currentBlock) == false)
         {
             currentBlock.Move(-1, 0);
             LockBlock();
@@ -152,9 +152,10 @@ void Game::MoveBlockDownNow()
         }
     }
 }
-bool Game::IsBlockOutside()
+
+bool Game::IsBlockOutside(Block block)
 {
-    std::vector<Position> tiles = currentBlock.GetCellPositions();
+    std::vector<Position> tiles = block.GetCellPositions();
     for (Position item : tiles)
     {
         if (grid.IsCellOutside(item.row, item.column))
@@ -170,7 +171,7 @@ void Game::RotateBlock()
     if (!gameOver)
     {
         currentBlock.Rotate();
-        if (IsBlockOutside() || BlockFits() == false)
+        if (IsBlockOutside(currentBlock) || BlockFits(currentBlock) == false)
         {
             currentBlock.UndoRotation();
         }
@@ -189,7 +190,7 @@ void Game::LockBlock()
         grid.grid[item.row][item.column] = currentBlock.id;
     }
     currentBlock = nextBlock;
-    if (BlockFits() == false)
+    if (BlockFits(currentBlock) == false)
     {
         gameOver = true;
         timePlayed = GetTime();
@@ -203,19 +204,6 @@ void Game::LockBlock()
         UpdateScore(rowsCleared);
         UpdateLinesCleared(rowsCleared);
     }
-}
-
-bool Game::BlockFits()
-{
-    std::vector<Position> tiles = currentBlock.GetCellPositions();
-    for (Position item : tiles)
-    {
-        if (grid.IsCellEmpty(item.row, item.column) == false)
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 bool Game::BlockFits(Block block)
