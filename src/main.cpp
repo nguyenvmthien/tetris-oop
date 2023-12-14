@@ -4,38 +4,76 @@
 #include <iostream>
 #include "myGui.hpp"
 double lastUpdateTime = 0;
-
+// chinh constructor ButtonO
+//  chinh thong so
+// chinh thong so ô nhập tên
 int main()
 {
-    const int screenWidth = 1100;
-    const int screenHeight = 950;
+    const int screenWidth = 1200;
+    const int screenHeight = 800;
     int lose = 0;
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     InitWindow(screenWidth, screenHeight, "My Button Classes");
 
     SetTargetFPS(60);
     InitAudioDevice();
-    int choice = 1;
+    int choice = 2;
     Font font1 = LoadFont("resources/fonts/monogram.ttf");
     Font font2 = LoadFont("resources/fonts/segoeui.ttf");
-    ButtonO btn1("Let's Play", 100, 200, font1);
-    ButtonO btn2("How To Play", 100, 400, font1);
-    ButtonO btn3("Leader Board", 100, 600, font1);
-    ButtonO btn4("Home", 500, 200, font1);
-    ButtonO btn5("Start", 100, 600, font1);
-    ButtonO btn6("PLAY AGAIN", 100, 300, font1);
-    ButtonO btn7("IF LOSE", 100, 400, font1);
+
+    Image image1 = LoadImage("img/TETRIS1.png");
+    Image image2 = LoadImage("img/TETRIS2.png");
+    Image image3 = LoadImage("img/TETRIS3.png");
+    Image letplay = LoadImage("img/letplay.png");
+    Image howtoplay = LoadImage("img/howtoplay.png");
+    Image leaderboard = LoadImage("img/leaderboard.png");
+    Image home = LoadImage("img/home.png");
+    Image trophy = LoadImage("img/trophy.png");
+
+    Texture2D tetrisImage1 = LoadTextureFromImage(image1);
+    Texture2D tetrisImage2 = LoadTextureFromImage(image2);
+    Texture2D tetrisImage3 = LoadTextureFromImage(image3);
+    Texture2D homeImage1 = LoadTextureFromImage(letplay);
+    Texture2D homeImage2 = LoadTextureFromImage(howtoplay);
+    Texture2D homeImage3 = LoadTextureFromImage(leaderboard);
+    Texture2D homeImage4 = LoadTextureFromImage(home);
+    Texture2D trophyImage = LoadTextureFromImage(trophy);
+
+    UnloadImage(trophy);
+    UnloadImage(image1);
+    UnloadImage(image2);
+    UnloadImage(image3);
+    UnloadImage(letplay);
+    UnloadImage(howtoplay);
+    UnloadImage(leaderboard);
+    UnloadImage(home);
+
+    ButtonO btn1("       Let's Play      ", 110, 350, font1, 50, 4);
+    ButtonO btn2("   How To Play   ", 500, 475, font1, 50, 4);
+    ButtonO btn3("   Leader Board   ", 110, 600, font1, 50, 4);
+    ButtonO btn4("", 1020, 20, font1, 60, 6); // HOME
+    ButtonO btn5("Start", 490, 600, font1, 60, 4);
+    ButtonO btn6("PLAY AGAIN", 100, 300, font1, 50, 4);
+    ButtonO btn7("IF LOSE", 100, 400, font1, 50, 4);
     while (!WindowShouldClose())
     {
-       
 
         if (choice == 2)
         {
             BeginDrawing();
-            ClearBackground(RED);
-            DrawTextEx(font1, "GET READY", {839, 417}, 40, 5, PINK);
+            ClearBackground({43, 39, 57, 1});
+            Rectangle textBox = {200, 400, 800, 100};
+            DrawRectangleRec(textBox, LIGHTGRAY);
+            DrawTextEx(font1, "Enter your name", {200, 350}, 30, 5, PINK);
+            DrawTextEx(font1, "Maximum 9 characters", {600, 510}, 30, 5, PINK);
+            DrawTextEx(font1, "GET READY", {450, 50}, 60, 5, PINK);
             btn4.draw();
             btn5.draw();
+            DrawTexture(homeImage4, 1065, 27, WHITE);
+            if (btn5.isHover() == true || btn4.isHover() == true)
+                DrawTexture(tetrisImage1, 200, 100, WHITE);
+            else
+                DrawTexture(tetrisImage2, 200, 100, WHITE);
             EndDrawing();
             if (btn4.update() == MOUSE_BUTTON_LEFT)
                 choice = 1;
@@ -45,11 +83,17 @@ int main()
         else if (choice == 1)
         {
             BeginDrawing();
-            ClearBackground(WHITE);
-            DrawTextEx(font1, "HOME", {839, 417}, 40, 5, PINK);
+            ClearBackground({43, 39, 57, 1});
+            if (btn1.isHover() == true || btn2.isHover() == true || btn3.isHover() == true)
+                DrawTexture(tetrisImage1, 200, 100, WHITE);
+            else
+                DrawTexture(tetrisImage2, 200, 100, WHITE);
+
+            DrawTextEx(font1, "HOME", {500, 50}, 60, 5, PINK);
             btn1.draw();
             btn2.draw();
             btn3.draw();
+
             EndDrawing();
             if (btn1.update() == MOUSE_BUTTON_LEFT)
                 choice = 2;
@@ -61,10 +105,14 @@ int main()
 
         else if (choice == 3)
         {
+            Image image = LoadImage("img/huongdanchoi.png");
+            Texture2D huongdanImage = LoadTextureFromImage(image);
+            UnloadImage(image);
             BeginDrawing();
-            ClearBackground(YELLOW);
+            ClearBackground(Color{43, 39, 57, 1});
             btn4.draw();
-            DrawTextEx(font1, "HOW TO PLAY", {839, 417}, 40, 5, PINK);
+            DrawTextEx(font1, "HOW TO PLAY", {400, 100}, 40, 5, PINK);
+            DrawTexture(huongdanImage, 100, 200, WHITE);
             EndDrawing();
             if (btn4.update() == MOUSE_BUTTON_LEFT)
                 choice = 1;
@@ -73,9 +121,14 @@ int main()
         else if (choice == 4)
         {
             BeginDrawing();
-            ClearBackground(PINK);
+            ClearBackground(Color{43, 39, 57, 1});
             btn4.draw();
-            DrawTextEx(font1, "LEADERBOARD", {839, 417}, 40, 5, BLACK);
+            DrawTextEx(font1, "LEADERBOARD", {350, 100}, 80, 5, PINK);
+            DrawTexture(trophyImage, 100, 200, WHITE);
+            DrawTextEx(font1, "Name", {400, 215}, 40, 5, BLACK);
+            DrawTextEx(font1, "Score", {650, 215}, 40, 5, BLACK);
+            DrawTextEx(font1, "Time", {900, 215}, 40, 5, BLACK);
+
             EndDrawing();
             if (btn4.update() == MOUSE_BUTTON_LEFT)
                 choice = 1;
@@ -87,7 +140,7 @@ int main()
             ClearBackground(BLUE);
             btn4.draw();
             btn7.draw();
-            DrawTextEx(font1, "PLAY GAME", {839, 417}, 40, 5, PINK);
+            DrawTextEx(font1, "PLAY GAME", {400, 100}, 40, 5, PINK);
             EndDrawing();
             if (btn4.update() == MOUSE_BUTTON_LEFT)
                 choice = 1;
@@ -104,7 +157,7 @@ int main()
             ClearBackground(ORANGE);
             btn4.draw();
             btn6.draw();
-            DrawTextEx(font1, "GAME OVER", {839, 417}, 40, 5, PINK);
+            DrawTextEx(font1, "GAME OVER", {400, 100}, 40, 5, PINK);
             EndDrawing();
             if (btn4.update() == MOUSE_BUTTON_LEFT)
                 choice = 1;
