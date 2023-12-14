@@ -2,6 +2,7 @@
 #include "grid.h"
 #include "blocks.cpp"
 #include <string>
+#include <iostream>
 class Game
 {
 public:
@@ -11,9 +12,22 @@ public:
     void HandleInput();
     void MoveBlockDown();
     void MoveBlockDownNow();
-    void MoveShadowBlock(Block &shadow);
+    void Guide();
+    double updateInterval();
+    bool EventTriggered(double& lastUpdateTime);
+    void Over(double& lastUpdateTim);
+    void GetReady();
+    void GameInfo();
+    void Play(double& lastUpdateTime);
+    void EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS);
+    void Home();
+    int wWidth;
+    int wHeight;
+    Color backgroundColor;
+    Font font;
     bool gameOver;
     int score;
+    int isReady;
     Music music;
     int linesCleared;
     int timePlayed;
@@ -27,6 +41,7 @@ private:
     bool IsBlockOutside(Block block);
     void RotateBlock();
     void LockBlock();
+    bool BlockFits();
     bool BlockFits(Block block);
     void Reset();
     void UpdateScore(int linesCleared);
