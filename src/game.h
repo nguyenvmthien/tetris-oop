@@ -12,6 +12,16 @@ public:
     void MoveBlockDown();
     void MoveBlockDownNow();
     void HuongDan();
+    double updateInterval();
+    bool EventTriggered(double& lastUpdateTime);
+    void Over(double& lastUpdateTim);
+    void GetReady(float& numPosX, float& readyPosX);
+    void GameInfo();
+    void Play(double& lastUpdateTime);
+    int wWidth;
+    int wHeight;
+    Color playBackColor;
+    Font font;
     bool gameOver;
     int score;
     int isReady;

@@ -3,6 +3,10 @@
 
 Game::Game()
 {
+    wWidth = 1200;
+    wHeight = 800;
+    playBackColor = {43, 39, 57, 1};
+    font = LoadFontEx("Font/Inter-Bold.ttf", 64, 0, 0);
     grid = Grid();
     blocks = GetAllBlocks();
     currentBlock = GetRandomBlock();
@@ -154,6 +158,7 @@ void Game::MoveBlockDownNow()
         }
     }
 }
+
 bool Game::IsBlockOutside()
 {
     std::vector<Position> tiles = currentBlock.GetCellPositions();
@@ -283,5 +288,126 @@ void Game::HuongDan()
         DrawTexture(huongdanImage, 100, 135, WHITE);
         EndDrawing();
         UnloadTexture(huongdanImage);
+    }
+}
+
+double Game::updateInterval()
+{
+    double interval = 0.5;
+    interval = interval - (linesCleared / 5) * 0.1 > 0.2 ? interval - (linesCleared / 5) * 0.1 : 0.2;
+    return interval;
+}
+
+bool Game::EventTriggered(double& lastUpdateTime)
+{   
+    double currentTime = GetTime();
+    if (currentTime - lastUpdateTime >= updateInterval())
+    {
+        lastUpdateTime = currentTime;
+        return true;
+    }
+    return false;
+}
+
+void Game::Over(double& lastUpdateTime)
+{
+    DrawTextEx(font, "Game Over", {200, 400}, 40, 5, PINK);
+    DrawTextEx(font, "Press R to restart", {200, 500}, 40, 5, PINK);
+    lastUpdateTime = 0;
+}
+
+void Game::GetReady(float& numPosX, float& readyPosX)
+{
+    if (isReady < 50)
+    {
+        DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, YELLOW);
+    }
+    else if (isReady < 100)
+    {
+        DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, playBackColor);
+        DrawTextEx(font, "3", {numPosX, 50}, 50, 4, YELLOW);
+    }
+    else if (isReady < 150)
+    {
+        DrawTextEx(font, "3", {numPosX, 50}, 50, 4, playBackColor);
+        DrawTextEx(font, "2", {numPosX, 50}, 50, 4, YELLOW);
+    }
+    else if (isReady < 200)
+    {
+        DrawTextEx(font, "2", {numPosX, 50}, 50, 4, playBackColor);
+        DrawTextEx(font, "1", {numPosX, 50}, 50, 4, YELLOW);
+    }
+    else if (isReady < 250)
+    {
+        DrawTextEx(font, "1", {numPosX, 50}, 50, 4, playBackColor);
+        DrawTextEx(font, "0", {numPosX, 50}, 50, 4, YELLOW);
+    }
+    else
+    {
+        DrawTextEx(font, "0", {numPosX, 50}, 50, 4, playBackColor);
+    }
+    isReady++;
+}
+
+void Game::GameInfo()
+{
+    DrawTextEx(font, "Score", {839, 417}, 40, 5, PINK);
+    DrawTextEx(font, "Next", {833, 99}, 40, 5, PINK);
+    DrawTextEx(font, "Line", {370, 460}, 40, 5, PINK);
+    DrawTextEx(font, "Name", {370, 99}, 40, 5, PINK);
+    DrawTextEx(font, "Interval", {100, 99}, 40, 5, PINK);   
+
+    char intervalText[10];
+    sprintf(intervalText, "%.1f", updateInterval());
+    DrawTextEx(font, intervalText, {100, 146}, 40, 5, WHITE);
+
+    char namePlayedText[10];
+    sprintf(namePlayedText, "%d", namePlayer.c_str());
+    DrawTextEx(font, namePlayedText, {400, 146}, 40, 5, WHITE);
+
+    // DrawRectangleRounded({863, 482, 250, 100}, 1, 6, lightBlue);
+    char scoreText[10];
+    sprintf(scoreText, "%d", score);
+    Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
+
+    DrawTextEx(font, scoreText, {839 + 55 - textSize.x/2, 460}, 40, 5, WHITE);
+
+    char linesClearedText[10];
+    sprintf(linesClearedText, "%d", linesCleared);
+    DrawTextEx(font, linesClearedText, {400, 511}, 40, 5, WHITE);
+
+    DrawRectangleRounded({863, 146, 250, 200}, 0.5, 6, darkGrey);
+    Draw();
+}
+
+void Game::Play(double& lastUpdateTime)
+{   
+    float numPosX = wWidth/2 + 20;
+    float readyPosX = wHeight/2 - 70;
+    while (WindowShouldClose() == false)
+    {
+        BeginDrawing();
+        ClearBackground(playBackColor);
+        UpdateMusicStream(music);
+
+        if (isReady < 300)
+            GetReady(numPosX, readyPosX);
+        else 
+        {
+            HandleInput();
+            if (EventTriggered(lastUpdateTime))
+            {
+                MoveBlockDown();
+            }
+        }
+        if (gameOver)
+        {
+            Over(lastUpdateTime);
+        }
+        else
+        {
+            GameInfo();
+        }
+        EndDrawing();
     }
 }
