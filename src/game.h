@@ -17,6 +17,7 @@ public:
     int linesCleared;
     int timePlayed;
     std::string namePlayer;
+
 private:
     void MoveBlockLeft();
     void MoveBlockRight();
@@ -26,6 +27,7 @@ private:
     void RotateBlock();
     void LockBlock();
     bool BlockFits();
+    bool BlockFits(Block block);
     void Reset();
     void UpdateScore(int linesCleared);
     void UpdateLinesCleared(int linesCleared);
