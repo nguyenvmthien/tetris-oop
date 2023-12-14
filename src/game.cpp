@@ -5,7 +5,7 @@ Game::Game()
 {
     wWidth = 1200;
     wHeight = 800;
-    playBackColor = {43, 39, 57, 1};
+    backgroundColor = {43, 39, 57, 1};
     font = LoadFontEx("Font/Inter-Bold.ttf", 64, 0, 0);
     grid = Grid();
     blocks = GetAllBlocks();
@@ -276,9 +276,9 @@ void Game::WriteResultToFile()
     // }
 }
 
-void Game::HuongDan()
+void Game::Guide()
 {
-    while (!IsKeyPressed(KEY_ENTER) )
+    while (!IsKeyPressed(KEY_H))
     {
         Image image = LoadImage("img/huongdanchoi.png");
         Texture2D huongdanImage = LoadTextureFromImage(image);
@@ -316,37 +316,48 @@ void Game::Over(double& lastUpdateTime)
     lastUpdateTime = 0;
 }
 
-void Game::GetReady(float& numPosX, float& readyPosX)
+void Game::GetReady()
 {
-    if (isReady < 50)
-    {
-        DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, YELLOW);
+    float numPosX = wWidth/2 + 20;
+    float readyPosX = wWidth/2 - 70;
+
+    while(!WindowShouldClose())
+    {   
+        UpdateMusicStream(music);
+        BeginDrawing();
+        ClearBackground(backgroundColor);
+        GameInfo();
+        if (isReady < 50)
+            DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, YELLOW);
+        else if (isReady < 100)
+        {
+            DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, backgroundColor);
+            DrawTextEx(font, "3", {numPosX, 50}, 50, 4, YELLOW);
+        }
+        else if (isReady < 150)
+        {
+            DrawTextEx(font, "3", {numPosX, 50}, 50, 4, backgroundColor);
+            DrawTextEx(font, "2", {numPosX, 50}, 50, 4, YELLOW);
+        }
+        else if (isReady < 200)
+        {
+            DrawTextEx(font, "2", {numPosX, 50}, 50, 4, backgroundColor);
+            DrawTextEx(font, "1", {numPosX, 50}, 50, 4, YELLOW);
+        }
+        else if (isReady < 250)
+        {
+            DrawTextEx(font, "1", {numPosX, 50}, 50, 4, backgroundColor);
+            DrawTextEx(font, "0", {numPosX, 50}, 50, 4, YELLOW);
+        }
+        else if (isReady < 300)
+        {
+            DrawTextEx(font, "0", {numPosX, 50}, 50, 4, backgroundColor);
+        }
+        EndDrawing();
+        isReady++; 
+        if (isReady == 300)
+            break;
     }
-    else if (isReady < 100)
-    {
-        DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, playBackColor);
-        DrawTextEx(font, "3", {numPosX, 50}, 50, 4, YELLOW);
-    }
-    else if (isReady < 150)
-    {
-        DrawTextEx(font, "3", {numPosX, 50}, 50, 4, playBackColor);
-        DrawTextEx(font, "2", {numPosX, 50}, 50, 4, YELLOW);
-    }
-    else if (isReady < 200)
-    {
-        DrawTextEx(font, "2", {numPosX, 50}, 50, 4, playBackColor);
-        DrawTextEx(font, "1", {numPosX, 50}, 50, 4, YELLOW);
-    }
-    else if (isReady < 250)
-    {
-        DrawTextEx(font, "1", {numPosX, 50}, 50, 4, playBackColor);
-        DrawTextEx(font, "0", {numPosX, 50}, 50, 4, YELLOW);
-    }
-    else
-    {
-        DrawTextEx(font, "0", {numPosX, 50}, 50, 4, playBackColor);
-    }
-    isReady++;
 }
 
 void Game::GameInfo()
@@ -362,7 +373,7 @@ void Game::GameInfo()
     DrawTextEx(font, intervalText, {100, 146}, 40, 5, WHITE);
 
     char namePlayedText[10];
-    sprintf(namePlayedText, "%d", namePlayer.c_str());
+    sprintf(namePlayedText, "%s", namePlayer.c_str());
     DrawTextEx(font, namePlayedText, {400, 146}, 40, 5, WHITE);
 
     // DrawRectangleRounded({863, 482, 250, 100}, 1, 6, lightBlue);
@@ -382,23 +393,16 @@ void Game::GameInfo()
 
 void Game::Play(double& lastUpdateTime)
 {   
-    float numPosX = wWidth/2 + 20;
-    float readyPosX = wHeight/2 - 70;
     while (WindowShouldClose() == false)
     {
         BeginDrawing();
-        ClearBackground(playBackColor);
+        ClearBackground(backgroundColor);
         UpdateMusicStream(music);
 
-        if (isReady < 300)
-            GetReady(numPosX, readyPosX);
-        else 
+        HandleInput();
+        if (EventTriggered(lastUpdateTime))
         {
-            HandleInput();
-            if (EventTriggered(lastUpdateTime))
-            {
-                MoveBlockDown();
-            }
+            MoveBlockDown();
         }
         if (gameOver)
         {
@@ -410,4 +414,102 @@ void Game::Play(double& lastUpdateTime)
         }
         EndDrawing();
     }
+}
+
+void Game::EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS)
+{
+    if (mouseOnText)
+    {
+        SetMouseCursor(MOUSE_CURSOR_IBEAM);
+
+        int key = GetCharPressed();
+
+        while (key > 0)
+        {
+            if ((key >= 32) && (key <= 125) && (letterCount < MAX_INPUT_CHARS))
+            {
+                namePlayer[letterCount] = (char)key;
+                namePlayer[letterCount + 1] = '\0';
+                letterCount++;
+            }
+
+            key = GetCharPressed();
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE))
+        {
+            letterCount--;
+            if (letterCount < 0)
+                letterCount = 0;
+            namePlayer[letterCount] = '\0';
+        }
+    }
+    else
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+}
+
+void Game::Home()
+{
+    int MAX_INPUT_CHARS = 9;
+    int letterCount = 0;
+    Rectangle textBox = {600, 400, 255, 50};
+    bool mouseOnText = 1;
+    int framesCounter = 0;
+
+    Image image = LoadImage("img/TETRIS.png");
+    Texture2D tetrisImage = LoadTextureFromImage(image);
+    UnloadImage(image);
+
+    while (!WindowShouldClose())
+    {
+        if (IsMouseButtonPressed(0))
+        {
+            if (CheckCollisionPointRec(GetMousePosition(), textBox))
+                mouseOnText = true;
+            else
+                mouseOnText = false;
+        }
+        EnterName(mouseOnText, letterCount, MAX_INPUT_CHARS);
+        if (mouseOnText)
+            framesCounter++;
+        else
+            framesCounter = 0;
+        
+        BeginDrawing();
+        ClearBackground(Color{43, 39, 57, 1});
+        DrawTexture(tetrisImage, 350, 100, WHITE);
+        DrawTextEx(font, "Enter your name", {200, 400}, 40, 5, PINK);
+        DrawTextEx(font, "Press Enter to start", {200, 500}, 40, 5, PINK);
+        DrawTextEx(font, "Press H for help", {200, 600}, 40, 5, PINK);
+        
+        if (IsKeyPressed(KEY_TAB))
+        {
+            Guide();
+        }
+        
+        if (IsKeyPressed(KEY_ENTER))
+        {
+            break;
+        }
+        
+        DrawRectangleRec(textBox, LIGHTGRAY);
+        if (mouseOnText)
+            DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
+        else
+            DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, DARKGRAY);
+
+        DrawText(namePlayer.c_str(), (int)textBox.x + 5, (int)textBox.y + 8, 40, MAROON);
+
+        if (mouseOnText)
+        {
+            if (letterCount < MAX_INPUT_CHARS)
+            {
+                if (((framesCounter / 20) % 2) == 0)
+                    DrawText("_", (int)textBox.x + 8 + MeasureText(namePlayer.c_str(), 40), (int)textBox.y + 12, 40, MAROON);
+            }
+        }
+        EndDrawing();
+    }
+    UnloadTexture(tetrisImage);
+
 }
