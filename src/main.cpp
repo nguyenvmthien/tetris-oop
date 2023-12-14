@@ -2,61 +2,116 @@
 #include "game.h"
 #include "colors.h"
 #include <iostream>
-
+#include "myGui.hpp"
 double lastUpdateTime = 0;
-
-bool EventTriggered(double interval)
-{
-    double currentTime = GetTime();
-    if (currentTime - lastUpdateTime >= interval)
-    {
-        lastUpdateTime = currentTime;
-        return true;
-    }
-    return false;
-}
 
 int main()
 {
-    InitWindow(1200, 800, "Tetris");
+    const int screenWidth = 1100;
+    const int screenHeight = 950;
+    int lose = 0;
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+    InitWindow(screenWidth, screenHeight, "My Button Classes");
+
     SetTargetFPS(60);
-
-    Font font = LoadFontEx("Font/Inter-Bold.ttf", 64, 0, 0);
-
-    Game game = Game();
-
-    while (WindowShouldClose() == false)
+    InitAudioDevice();
+    int choice = 1;
+    Font font1 = LoadFont("resources/fonts/monogram.ttf");
+    Font font2 = LoadFont("resources/fonts/segoeui.ttf");
+    ButtonO btn1("Let's Play", 100, 200, font1);
+    ButtonO btn2("How To Play", 100, 400, font1);
+    ButtonO btn3("Leader Board", 100, 600, font1);
+    ButtonO btn4("Home", 500, 200, font1);
+    ButtonO btn5("Start", 100, 600, font1);
+    ButtonO btn6("PLAY AGAIN", 100, 300, font1);
+    ButtonO btn7("IF LOSE", 100, 400, font1);
+    while (!WindowShouldClose())
     {
-        UpdateMusicStream(game.music);
-        game.HandleInput();
-        if (EventTriggered(0.2))
+       
+
+        if (choice == 2)
         {
-            game.MoveBlockDown();
+            BeginDrawing();
+            ClearBackground(RED);
+            DrawTextEx(font1, "GET READY", {839, 417}, 40, 5, PINK);
+            btn4.draw();
+            btn5.draw();
+            EndDrawing();
+            if (btn4.update() == MOUSE_BUTTON_LEFT)
+                choice = 1;
+            if (btn5.update() == MOUSE_BUTTON_LEFT)
+                choice = 5;
+        }
+        else if (choice == 1)
+        {
+            BeginDrawing();
+            ClearBackground(WHITE);
+            DrawTextEx(font1, "HOME", {839, 417}, 40, 5, PINK);
+            btn1.draw();
+            btn2.draw();
+            btn3.draw();
+            EndDrawing();
+            if (btn1.update() == MOUSE_BUTTON_LEFT)
+                choice = 2;
+            if (btn2.update() == MOUSE_BUTTON_LEFT)
+                choice = 3;
+            if (btn3.update() == MOUSE_BUTTON_LEFT)
+                choice = 4;
         }
 
-        BeginDrawing();
-        ClearBackground(Color{43, 39, 57, 1});
-        DrawTextEx(font, "Score", {839, 417}, 40, 5, PINK);
-        DrawTextEx(font, "Next", {833, 99}, 40, 5, PINK);
-        DrawTextEx(font, "Line", {370, 460}, 40, 5, PINK);
-        if (game.gameOver)
+        else if (choice == 3)
         {
-            DrawTextEx(font, "GAME OVER", {150, 350}, 50, 5, PINK);
+            BeginDrawing();
+            ClearBackground(YELLOW);
+            btn4.draw();
+            DrawTextEx(font1, "HOW TO PLAY", {839, 417}, 40, 5, PINK);
+            EndDrawing();
+            if (btn4.update() == MOUSE_BUTTON_LEFT)
+                choice = 1;
         }
 
-        DrawRectangleRounded({863, 482, 250, 100}, 1, 6, lightBlue);
-        char scoreText[10];
-        sprintf(scoreText, "%d", game.score);
-        Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
-        DrawTextEx(font, scoreText, {863 + (250 - textSize.x) / 2, 493}, 40, 5, WHITE);
+        else if (choice == 4)
+        {
+            BeginDrawing();
+            ClearBackground(PINK);
+            btn4.draw();
+            DrawTextEx(font1, "LEADERBOARD", {839, 417}, 40, 5, BLACK);
+            EndDrawing();
+            if (btn4.update() == MOUSE_BUTTON_LEFT)
+                choice = 1;
+        }
 
-        char linesClearedText[10]; 
-        sprintf(linesClearedText, "%d", game.linesCleared);
-        DrawTextEx(font, linesClearedText, {400, 511}, 40, 5, WHITE);
+        else if (choice == 5)
+        {
+            BeginDrawing();
+            ClearBackground(BLUE);
+            btn4.draw();
+            btn7.draw();
+            DrawTextEx(font1, "PLAY GAME", {839, 417}, 40, 5, PINK);
+            EndDrawing();
+            if (btn4.update() == MOUSE_BUTTON_LEFT)
+                choice = 1;
+            if (btn7.update() == MOUSE_BUTTON_LEFT)
+            {
+                lose = 1;
+                choice = 6;
+            }
+        }
 
-        DrawRectangleRounded({863, 146, 250, 200}, 0.5, 6, lightBlue);
-        game.Draw();
-        EndDrawing();
+        else if (lose == 1 && choice == 6)
+        {
+            BeginDrawing();
+            ClearBackground(ORANGE);
+            btn4.draw();
+            btn6.draw();
+            DrawTextEx(font1, "GAME OVER", {839, 417}, 40, 5, PINK);
+            EndDrawing();
+            if (btn4.update() == MOUSE_BUTTON_LEFT)
+                choice = 1;
+            if (btn6.update() == MOUSE_BUTTON_LEFT)
+                choice = 2;
+        }
     }
     CloseWindow();
+    return 0;
 }
