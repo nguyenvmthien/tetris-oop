@@ -3,6 +3,7 @@
 #include "blocks.cpp"
 #include <string>
 #include <iostream>
+#include "myGui.hpp"
 class Game
 {
 public:
@@ -12,19 +13,21 @@ public:
     void HandleInput();
     void MoveBlockDown();
     void MoveBlockDownNow();
-    void Guide();
+    void Guide(int& choice);
     double updateInterval();
     bool EventTriggered(double& lastUpdateTime);
-    void Over(double& lastUpdateTim);
+    int Over();
     void GetReady();
     void GameInfo();
-    void Play(double& lastUpdateTime);
+    void Play(int& choice);
     void EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS);
-    void Home();
+    void Home(int& choice);
+    void Run();
     int wWidth;
     int wHeight;
     Color backgroundColor;
     Font font;
+    Font font1;
     bool gameOver;
     int score;
     int isReady;
@@ -32,13 +35,14 @@ public:
     int linesCleared;
     int timePlayed;
     std::string namePlayer;
+    double lastUpdateTime;
 
 private:
     void MoveBlockLeft();
     void MoveBlockRight();
     Block GetRandomBlock();
     std::vector<Block> GetAllBlocks();
-    bool IsBlockOutside(Block block);
+    bool IsBlockOutside();
     void RotateBlock();
     void LockBlock();
     bool BlockFits();
