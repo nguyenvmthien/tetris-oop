@@ -10,7 +10,7 @@ int main()
 {
     
     InitWindow(W, H, "Tetris");
-    SetTargetFPS(60);
+    SetTargetFPS(120);
 
     Game game = Game();
     game.Run();

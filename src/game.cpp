@@ -19,19 +19,61 @@ Game::Game()
     isReady = 0;
     namePlayer = "";
     lastUpdateTime = 0;
+    isMute = 0;
     InitAudioDevice();
     music = LoadMusicStream("sounds/music.mp3");
     PlayMusicStream(music);
     rotateSound = LoadSound("sounds/rotate.mp3");
     clearSound = LoadSound("sounds/clear.mp3");
+    LoadGameTexture();
 }
 
 Game::~Game()
 {
+    UnloadGameTexture();
     UnloadSound(rotateSound);
     UnloadSound(clearSound);
     UnloadMusicStream(music);
     CloseAudioDevice();
+}
+
+void Game::LoadGameTexture()
+{
+    tetrisImage1 = LoadTextureFromImage(LoadImage("img/TETRIS1.png"));
+    tetrisImage2 = LoadTextureFromImage(LoadImage("img/TETRIS2.png"));
+    tetrisImage3 = LoadTextureFromImage(LoadImage("img/TETRIS3.png"));
+    homeImage1 = LoadTextureFromImage(LoadImage("img/letplay.png"));
+    homeImage2 = LoadTextureFromImage(LoadImage("img/howtoplay.png"));
+    homeImage3 = LoadTextureFromImage(LoadImage("img/leaderboard.png"));
+    homeImage4 = LoadTextureFromImage(LoadImage("img/home.png"));
+    trophyImage = LoadTextureFromImage(LoadImage("img/trophy.png"));
+    gameOverOn = LoadTextureFromImage(LoadImage("img/GameOverOn.png"));
+    gameOverOff = LoadTextureFromImage(LoadImage("img/GameOverOff.png"));
+    breakRecord = LoadTextureFromImage(LoadImage("img/BreakTheRecord.png"));
+    soundOn = LoadTextureFromImage(LoadImage("img/SoundOn.png"));
+    soundOff = LoadTextureFromImage(LoadImage("img/SoundOff.png"));
+    aboutUs = LoadTextureFromImage(LoadImage("img/About.png"));
+    guide = LoadTextureFromImage(LoadImage("img/Guide.png"));
+}
+
+void Game::UnloadGameTexture()
+{
+    UnloadTexture(tetrisImage1);
+    UnloadTexture(tetrisImage2);
+    UnloadTexture(tetrisImage3);
+    UnloadTexture(homeImage1);
+    UnloadTexture(homeImage2);
+    UnloadTexture(homeImage3);
+    UnloadTexture(homeImage4);
+    UnloadTexture(trophyImage);
+    UnloadTexture(gameOverOn);
+    UnloadTexture(gameOverOff);
+    UnloadTexture(breakRecord);
+    UnloadTexture(soundOn);
+    UnloadTexture(soundOff);
+    UnloadTexture(aboutUs);
+    UnloadTexture(leaderBoard);
+    UnloadTexture(guide);
 }
 
 Block Game::GetRandomBlock()
@@ -268,23 +310,16 @@ void Game::WriteResultToFile()
 
 void Game::Guide(int& choice)
 {
-    Image image = LoadImage("img/Guide.png");
-    Image home = LoadImage("img/home.png");
-
-    Texture2D guide = LoadTextureFromImage(image);
-    Texture2D homeIcon = LoadTextureFromImage(home);
-
-    UnloadImage(image);
-    UnloadImage(home);
-
     ButtonO btn3(" ", 1020, 20, font1, 60, 6);   //short home
 
     while (!WindowShouldClose())
     {
+        if(!isMute)
+            UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(backgroundColor);
         btn3.draw();
-        DrawTexture(homeIcon, 1065, 27, WHITE);
+        DrawTexture(homeImage4, 1065, 27, WHITE);
         DrawTextEx(font1, "HOW TO PLAY", {400, 100}, 40, 5, PINK);
         DrawTexture(guide, 100, 200, WHITE);
         EndDrawing();
@@ -295,31 +330,22 @@ void Game::Guide(int& choice)
             break;
         }
     }
-    UnloadTexture(guide);
-    UnloadTexture(homeIcon);
 }
 
 void Game::LeaderBoard(int& choice)
 {
-    Image image = LoadImage("img/trophy.png");
-    Image home = LoadImage("img/home.png");
-
-    Texture2D board = LoadTextureFromImage(image);
-    Texture2D homeIcon = LoadTextureFromImage(home);
-
-    UnloadImage(image);
-    UnloadImage(home);
-
     ButtonO btn3(" ", 1020, 20, font1, 60, 6);
 
     while (!WindowShouldClose())
     {
+        if(!isMute)
+            UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(Color{43, 39, 57, 1});
         btn3.draw();
-        DrawTexture(homeIcon, 1065, 27, WHITE);
+        DrawTexture(homeImage4, 1065, 27, WHITE);
         DrawTextEx(font1, "LEADERBOARD", {350, 100}, 80, 5, PINK);
-        DrawTexture(board, 100, 200, WHITE);
+        DrawTexture(trophyImage, 100, 200, WHITE);
         DrawTextEx(font1, "Name", {400, 215}, 40, 5, BLACK);
         DrawTextEx(font1, "Score", {650, 215}, 40, 5, BLACK);
         DrawTextEx(font1, "Time", {900, 215}, 40, 5, BLACK);
@@ -331,7 +357,6 @@ void Game::LeaderBoard(int& choice)
             break;
         }
     }
-    UnloadTexture(board);
 }
 
 double Game::updateInterval()
@@ -354,23 +379,13 @@ bool Game::EventTriggered(double& lastUpdateTime)
 
 void Game::Over(int& choice)
 {
-    Image gameover1 = LoadImage("img/GameOverOn.png");
-    Image gameover2 = LoadImage("img/GameOverOff.png");
-    Image breakrecord = LoadImage("img/BreakTheRecord.png");
-
-    Texture2D gameOverOn = LoadTextureFromImage(gameover1);
-    Texture2D gameOverOff = LoadTextureFromImage(gameover2);
-    Texture2D breakRecord = LoadTextureFromImage(breakrecord);
-
-    UnloadImage(gameover1);
-    UnloadImage(gameover2);
-    UnloadImage(breakrecord);
-
     ButtonO btn3(" Play again ", 350, 400, font1, 60, 4);
     ButtonO btn5("   Home  ", 350, 600, font1, 60, 4);
 
     while(!WindowShouldClose())
     {
+        if(!isMute)
+            UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(backgroundColor);
         btn3.draw();
@@ -401,42 +416,32 @@ void Game::Over(int& choice)
             break;
         }
     }
-    UnloadTexture(gameOverOn);
-    UnloadTexture(gameOverOff);
-    UnloadTexture(breakRecord);
 }
 
 void Game::CountDown()
 {
     float numPosX = wWidth/2 + 20;
-    float readyPosX = wWidth/2 - 70;
+    int readyPosX = wWidth/2 - 70;
 
-    while(!WindowShouldClose() && isReady < 300)
+    auto start = std::chrono::steady_clock::now();
+    int countTime = 3;
+    
+    while(!WindowShouldClose() && countTime != -1)
     {   
-        UpdateMusicStream(music);
+        if(!isMute)
+            UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(backgroundColor);
         GameInfo();
-        if (isReady < 50)
-            DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, YELLOW);
-        else if (isReady < 100)
-        {
-            DrawTextEx(font, "3", {numPosX, 50}, 50, 4, YELLOW);
-        }
-        else if (isReady < 150)
-        {
-            DrawTextEx(font, "2", {numPosX, 50}, 50, 4, YELLOW);
-        }
-        else if (isReady < 200)
-        {
-            DrawTextEx(font, "1", {numPosX, 50}, 50, 4, YELLOW);
-        }
-        else if (isReady < 250)
-        {
-            DrawTextEx(font, "0", {numPosX, 50}, 50, 4, YELLOW);
-        }
+       
+        char countDown[10];
+        sprintf(countDown, "%d", countTime);
+        DrawTextEx(font, countDown, {numPosX, 50}, 50, 4, YELLOW);
         EndDrawing();
-        isReady++; 
+
+        auto end = std::chrono::steady_clock::now();
+        countTime = std::chrono::duration_cast<chrono::seconds>(end - start).count();
+        countTime = 3 - countTime;
     }
 }
 
@@ -480,7 +485,8 @@ void Game::Play(int& choice)
     {
         BeginDrawing();
         ClearBackground(backgroundColor);
-        UpdateMusicStream(music);
+        if(!isMute)
+            UpdateMusicStream(music);
 
         HandleInput();
         if (EventTriggered(lastUpdateTime))
@@ -535,37 +541,33 @@ void Game::EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS)
 
 void Game::Home(int& choice)
 {
-    Image image1 = LoadImage("img/TETRIS1.png");
-    Image image2 = LoadImage("img/TETRIS2.png");
-    Image letplay = LoadImage("img/letplay.png");
-    Image howtoplay = LoadImage("img/howtoplay.png");
-    Image leaderboard = LoadImage("img/leaderboard.png");
-
-    Texture2D tetrisImage1 = LoadTextureFromImage(image1);
-    Texture2D tetrisImage2 = LoadTextureFromImage(image2);
-    Texture2D homeImage1 = LoadTextureFromImage(letplay);
-    Texture2D homeImage2 = LoadTextureFromImage(howtoplay);
-    Texture2D homeImage3 = LoadTextureFromImage(leaderboard);
-
-    UnloadImage(image1);
-    UnloadImage(image2);
-    UnloadImage(letplay);
-    UnloadImage(howtoplay);
-    UnloadImage(leaderboard);
-
     ButtonO btn0("        Let's Play      ", 110, 350, font1, 50, 4);
     ButtonO btn1(" How To Play     ", 500, 475, font1, 50, 4);
     ButtonO btn2("     Leader Board ", 110, 600, font1, 50, 4);
+    ButtonO btnSound(" ", 1020, 600, font1, 60, 6);
+    ButtonO btnAbout(" ", 1020, 700, font1, 60, 6);
 
     while (!WindowShouldClose())
     {
+        if(!isMute)
+            UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(Color{43, 39, 57, 1});
 
         btn0.draw();
         btn1.draw();
         btn2.draw();
+        btnSound.draw();
+        btnAbout.draw();
         
+        if (btnSound.update() == MOUSE_BUTTON_LEFT)
+                isMute = !isMute;
+        if (isMute)
+            DrawTexture(soundOff, 1050, 610, WHITE);
+        else
+            DrawTexture(soundOn, 1050, 610, WHITE);
+
+        DrawTexture(aboutUs, 1050, 700, WHITE);
         DrawTextEx(font1, "HOME", {500, 50}, 60, 5, PINK);
         DrawTexture(homeImage1, 200, 352, WHITE);
         DrawTexture(homeImage2, 900, 474, WHITE);
@@ -576,8 +578,6 @@ void Game::Home(int& choice)
                 DrawTexture(tetrisImage2, 200, 100, WHITE);
         
         EndDrawing();
-
-        cout << "in home " << choice << endl;
 
         if (btn0.update() == MOUSE_BUTTON_LEFT)
         {
@@ -595,11 +595,6 @@ void Game::Home(int& choice)
             break;
         }
     }
-    UnloadTexture(tetrisImage1);
-    UnloadTexture(tetrisImage2);
-    UnloadTexture(homeImage1);
-    UnloadTexture(homeImage2);
-    UnloadTexture(homeImage3);
 }
 
 void Game::GetReady(int& choice)
@@ -608,18 +603,6 @@ void Game::GetReady(int& choice)
     ButtonO btn5("Start", 490, 600, font1, 60, 4);
     Rectangle textBox = {200, 400, 800, 100};
 
-    Image home = LoadImage("img/home.png");
-    Image image1 = LoadImage("img/TETRIS1.png");
-    Image image2 = LoadImage("img/TETRIS2.png");
-
-    Texture2D homeImage4 = LoadTextureFromImage(home);
-    Texture2D tetrisImage1 = LoadTextureFromImage(image1);
-    Texture2D tetrisImage2 = LoadTextureFromImage(image2);
-    
-    UnloadImage(home);
-    UnloadImage(image1);
-    UnloadImage(image2);
-
     bool mouseOnText = 1;
     int framesCounter = 0;
     int letterCount = 0;
@@ -627,6 +610,8 @@ void Game::GetReady(int& choice)
 
     while(!WindowShouldClose())
     {
+        if(!isMute)
+            UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground({43, 39, 57, 1});
         
@@ -684,9 +669,6 @@ void Game::GetReady(int& choice)
             break;
         }
     }
-    UnloadTexture(homeImage4);
-    UnloadTexture(tetrisImage1);
-    UnloadTexture(tetrisImage2);
 }
 
 void Game::Run()
@@ -704,7 +686,6 @@ void Game::Run()
         else if (choice == 3)
         {
             Home(choice);
-            cout << "after home " << choice << endl;
         }
         else if (choice == 1)
         {
