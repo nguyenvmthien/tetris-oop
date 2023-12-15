@@ -56,6 +56,8 @@ void Game::LoadGameTexture()
     aboutUs = LoadTextureFromImage(LoadImage("img/About.png"));
     guide = LoadTextureFromImage(LoadImage("img/Guide.png"));
     logo = LoadTextureFromImage(LoadImage("img/TETRISsmall.png"));
+    aboutUsNormal = LoadTextureFromImage(LoadImage("img/AboutUsNormal.png"));
+    aboutUsHover = LoadTextureFromImage(LoadImage("img/AboutUsHover.png"));
 }
 
 void Game::UnloadGameTexture()
@@ -77,6 +79,8 @@ void Game::UnloadGameTexture()
     UnloadTexture(leaderBoard);
     UnloadTexture(guide);
     UnloadTexture(logo);
+    UnloadTexture(aboutUsNormal);
+    UnloadTexture(aboutUsHover);
 }
 
 Block Game::GetRandomBlock()
@@ -483,6 +487,43 @@ void Game::Over(int &choice)
     }
 }
 
+void Game::InfoGroup(int &choice)
+{
+    ButtonO btn3(" ", 1020, 20, font1, 60, 6); // short home
+
+    while (!WindowShouldClose())
+    {
+        if (!isMute)
+            UpdateMusicStream(music);
+        BeginDrawing();
+
+        if (btn3.isHover() == true)
+        {
+            ClearBackground(backgroundColor);
+            btn3.draw();
+            DrawTexture(homeImage4, 1065, 27, WHITE);
+            DrawTextEx(font1, "About Us", {100, 20}, 150, 5, PINK);
+            DrawTexture(aboutUsHover, 0, 167, WHITE);
+        }
+
+        else
+        {
+            ClearBackground(WHITE);
+            btn3.draw();
+            DrawTexture(homeImage4, 1065, 27, WHITE);
+            DrawTextEx(font1, "About Us", {100, 20}, 150, 5, {148, 82, 255, 255});
+            DrawTexture(aboutUsNormal, 0, 167, WHITE);
+        }
+
+        EndDrawing();
+
+        if (btn3.update() == MOUSE_BUTTON_LEFT)
+        {
+            choice = 3;
+            break;
+        }
+    }
+}
 void Game::CountDown()
 {
     float numPosX = wWidth / 2 + 10;
@@ -656,6 +697,11 @@ void Game::Home(int &choice)
             choice = 2;
             break;
         }
+        if (btnAbout.update() == MOUSE_BUTTON_LEFT)
+        {
+            choice = 7;
+            break;
+        }
     }
 }
 
@@ -765,6 +811,10 @@ void Game::Run()
         {
             Over(choice);
             Reset();
+        }
+        else if (choice == 7)
+        {
+            InfoGroup(choice);
         }
     }
 }

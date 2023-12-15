@@ -34,6 +34,7 @@ public:
     void Run();
     void LeaderBoard(int& choice);
     void GetReady(int& choice);
+    void InfoGroup(int& choice);
     int wWidth;
     int wHeight;
     Color backgroundColor;
@@ -85,6 +86,8 @@ private:
     Texture2D leaderBoard;
     Texture2D guide;
     Texture2D logo;
+    Texture2D aboutUsNormal;
+    Texture2D aboutUsHover;
     std::vector<Player> topPlayers;
     void getLeaderBoard();
 };
