@@ -269,16 +269,24 @@ void Game::WriteResultToFile()
 void Game::Guide(int& choice)
 {
     Image image = LoadImage("img/Guide.png");
+    Image home = LoadImage("img/home.png");
+
     Texture2D guide = LoadTextureFromImage(image);
+    Texture2D homeIcon = LoadTextureFromImage(home);
+
     UnloadImage(image);
-    ButtonO btn3("Home", 500, 200, font1);
+    UnloadImage(home);
+
+    ButtonO btn3("", 1020, 20, font1, 60, 6);   //short home
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
-        ClearBackground(Color{43, 39, 57, 1});
-        DrawTexture(guide, 100, 135, WHITE);
+        ClearBackground(backgroundColor);
         btn3.draw();
+        DrawTexture(homeIcon, 1065, 27, WHITE);
+        DrawTextEx(font1, "HOW TO PLAY", {400, 100}, 40, 5, PINK);
+        DrawTexture(guide, 100, 200, WHITE);
         EndDrawing();
         
         if (btn3.update() == MOUSE_BUTTON_LEFT)
@@ -288,6 +296,7 @@ void Game::Guide(int& choice)
         }
     }
     UnloadTexture(guide);
+    UnloadTexture(homeIcon);
 }
 
 void Game::LeaderBoard(int& choice)
@@ -597,13 +606,6 @@ void Game::Run()
         else if (choice == 2)
         {
             LeaderBoard(choice);
-            // BeginDrawing();
-            // ClearBackground(PINK);
-            // btn4.draw();
-            // DrawTextEx(font1, "LEADERBOARD", {839, 417}, 40, 5, BLACK);
-            // EndDrawing();
-            // if (btn4.update() == MOUSE_BUTTON_LEFT)
-            //     choice = 1;
         }
         // else if (choice == 5)
         // {
