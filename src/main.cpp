@@ -18,6 +18,8 @@ int main()
     SetTargetFPS(60);
     InitAudioDevice();
     int choice = 1;
+    bool is_mute = false;
+
     Font font1 = LoadFont("resources/fonts/monogram.ttf");
 
     Image image1 = LoadImage("img/TETRIS1.png");
@@ -31,6 +33,9 @@ int main()
     Image gameover1 = LoadImage("img/GameOverOn.png");
     Image gameover2 = LoadImage("img/GameOverOff.png");
     Image breakrecord = LoadImage("img/BreakTheRecord.png");
+    Image sound1 = LoadImage("img/SoundOn.png");
+    Image sound2 = LoadImage("img/SoundOff.png");
+    Image about = LoadImage("img/About.png");
 
     Texture2D tetrisImage1 = LoadTextureFromImage(image1);
     Texture2D tetrisImage2 = LoadTextureFromImage(image2);
@@ -43,6 +48,9 @@ int main()
     Texture2D gameOverOn = LoadTextureFromImage(gameover1);
     Texture2D gameOverOff = LoadTextureFromImage(gameover2);
     Texture2D breakRecord = LoadTextureFromImage(breakrecord);
+    Texture2D soundOn = LoadTextureFromImage(sound1);
+    Texture2D soundOff = LoadTextureFromImage(sound2);
+    Texture2D aboutUs = LoadTextureFromImage(about);
 
     UnloadImage(trophy);
     UnloadImage(image1);
@@ -55,6 +63,9 @@ int main()
     UnloadImage(gameover1);
     UnloadImage(gameover2);
     UnloadImage(breakrecord);
+    UnloadImage(sound1);
+    UnloadImage(sound2);
+    UnloadImage(about);
 
     ButtonO btn1("        Let's Play      ", 110, 350, font1, 50, 4);
     ButtonO btn2(" How To Play     ", 500, 475, font1, 50, 4);
@@ -64,6 +75,8 @@ int main()
     ButtonO btn5("Start", 490, 600, font1, 60, 4);
     ButtonO btn6(" Play again ", 350, 400, font1, 60, 4);
     ButtonO btn7("IF LOSE", 100, 400, font1, 50, 4);
+    ButtonO btnSound("", 1020, 600, font1, 60, 6);
+    ButtonO btnAbout("", 1020, 700, font1, 60, 6);
 
     while (!WindowShouldClose())
     {
@@ -103,9 +116,19 @@ int main()
             btn1.draw();
             btn2.draw();
             btn3.draw();
+            btnSound.draw();
+            btnAbout.draw();
+            if (btnSound.update() == MOUSE_BUTTON_LEFT)
+                is_mute = !is_mute;
+            if (is_mute == false)
+                DrawTexture(soundOn, 1050, 610, WHITE);
+            else
+                DrawTexture(soundOff, 1050, 610, WHITE);
+            DrawTexture(aboutUs, 1050, 700, WHITE);
             DrawTexture(homeImage1, 200, 352, WHITE);
             DrawTexture(homeImage2, 900, 474, WHITE);
             DrawTexture(homeImage3, 150, 603, WHITE);
+
             EndDrawing();
             if (btn1.update() == MOUSE_BUTTON_LEFT)
                 choice = 2;

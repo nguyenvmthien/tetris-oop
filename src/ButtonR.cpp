@@ -170,8 +170,8 @@ int ButtonR::update()
     {
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
-            btnLiveColor = btnPressed;
-            borderLiveColor = borderPressed;
+            btnLiveColor = btnIdle;
+            borderLiveColor = borderIdle;
             result = MOUSE_BUTTON_LEFT;
         }
         else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
@@ -289,7 +289,7 @@ void ButtonR::setShadowSize(float width, float height)
 
 bool ButtonR::isHover()
 {
-     Vector2 mouse_pos = GetMousePosition();
+    Vector2 mouse_pos = GetMousePosition();
     if (CheckCollisionPointRec(mouse_pos, rect))
         return true;
     else
