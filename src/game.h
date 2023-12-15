@@ -4,6 +4,14 @@
 #include <string>
 #include <iostream>
 #include "myGui.hpp"
+#include <string.h>
+struct Player
+{
+    char name[10];
+    int score;
+    int timePlayed;
+};
+
 class Game
 {
 public:
@@ -36,6 +44,7 @@ public:
     int timePlayed;
     std::string namePlayer;
     double lastUpdateTime;
+    Texture2D logo;
 
 private:
     void MoveBlockLeft();
@@ -56,4 +65,7 @@ private:
     Block nextBlock;
     Sound rotateSound;
     Sound clearSound;
+
+    std::vector<Player> topPlayers;
+    void getLeaderBoard();
 };
