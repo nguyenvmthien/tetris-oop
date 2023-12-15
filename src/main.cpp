@@ -17,9 +17,8 @@ int main()
 
     SetTargetFPS(60);
     InitAudioDevice();
-    int choice = 2;
+    int choice = 1;
     Font font1 = LoadFont("resources/fonts/monogram.ttf");
-    Font font2 = LoadFont("resources/fonts/segoeui.ttf");
 
     Image image1 = LoadImage("img/TETRIS1.png");
     Image image2 = LoadImage("img/TETRIS2.png");
@@ -29,6 +28,9 @@ int main()
     Image leaderboard = LoadImage("img/leaderboard.png");
     Image home = LoadImage("img/home.png");
     Image trophy = LoadImage("img/trophy.png");
+    Image gameover1 = LoadImage("img/GameOverOn.png");
+    Image gameover2 = LoadImage("img/GameOverOff.png");
+    Image breakrecord = LoadImage("img/BreakTheRecord.png");
 
     Texture2D tetrisImage1 = LoadTextureFromImage(image1);
     Texture2D tetrisImage2 = LoadTextureFromImage(image2);
@@ -38,6 +40,9 @@ int main()
     Texture2D homeImage3 = LoadTextureFromImage(leaderboard);
     Texture2D homeImage4 = LoadTextureFromImage(home);
     Texture2D trophyImage = LoadTextureFromImage(trophy);
+    Texture2D gameOverOn = LoadTextureFromImage(gameover1);
+    Texture2D gameOverOff = LoadTextureFromImage(gameover2);
+    Texture2D breakRecord = LoadTextureFromImage(breakrecord);
 
     UnloadImage(trophy);
     UnloadImage(image1);
@@ -47,14 +52,19 @@ int main()
     UnloadImage(howtoplay);
     UnloadImage(leaderboard);
     UnloadImage(home);
+    UnloadImage(gameover1);
+    UnloadImage(gameover2);
+    UnloadImage(breakrecord);
 
-    ButtonO btn1("       Let's Play      ", 110, 350, font1, 50, 4);
-    ButtonO btn2("   How To Play   ", 500, 475, font1, 50, 4);
-    ButtonO btn3("   Leader Board   ", 110, 600, font1, 50, 4);
-    ButtonO btn4("", 1020, 20, font1, 60, 6); // HOME
+    ButtonO btn1("        Let's Play      ", 110, 350, font1, 50, 4);
+    ButtonO btn2(" How To Play     ", 500, 475, font1, 50, 4);
+    ButtonO btn3("     Leader Board ", 110, 600, font1, 50, 4);
+    ButtonO btn4("", 1020, 20, font1, 60, 6); // HOME Ngắn
+    ButtonO btn8("   Home  ", 350, 600, font1, 60, 4);
     ButtonO btn5("Start", 490, 600, font1, 60, 4);
-    ButtonO btn6("PLAY AGAIN", 100, 300, font1, 50, 4);
+    ButtonO btn6(" Play again ", 350, 400, font1, 60, 4);
     ButtonO btn7("IF LOSE", 100, 400, font1, 50, 4);
+
     while (!WindowShouldClose())
     {
 
@@ -93,7 +103,9 @@ int main()
             btn1.draw();
             btn2.draw();
             btn3.draw();
-
+            DrawTexture(homeImage1, 200, 352, WHITE);
+            DrawTexture(homeImage2, 900, 474, WHITE);
+            DrawTexture(homeImage3, 150, 603, WHITE);
             EndDrawing();
             if (btn1.update() == MOUSE_BUTTON_LEFT)
                 choice = 2;
@@ -111,6 +123,7 @@ int main()
             BeginDrawing();
             ClearBackground(Color{43, 39, 57, 1});
             btn4.draw();
+            DrawTexture(homeImage4, 1065, 27, WHITE);
             DrawTextEx(font1, "HOW TO PLAY", {400, 100}, 40, 5, PINK);
             DrawTexture(huongdanImage, 100, 200, WHITE);
             EndDrawing();
@@ -123,6 +136,7 @@ int main()
             BeginDrawing();
             ClearBackground(Color{43, 39, 57, 1});
             btn4.draw();
+            DrawTexture(homeImage4, 1065, 27, WHITE);
             DrawTextEx(font1, "LEADERBOARD", {350, 100}, 80, 5, PINK);
             DrawTexture(trophyImage, 100, 200, WHITE);
             DrawTextEx(font1, "Name", {400, 215}, 40, 5, BLACK);
@@ -154,15 +168,21 @@ int main()
         else if (lose == 1 && choice == 6)
         {
             BeginDrawing();
-            ClearBackground(ORANGE);
-            btn4.draw();
+            ClearBackground(Color{43, 39, 57, 1});
             btn6.draw();
-            DrawTextEx(font1, "GAME OVER", {400, 100}, 40, 5, PINK);
+            btn8.draw();
+            DrawTextEx(font1, "Score: ", {400, 300}, 60, 8, PINK);
+            if (btn6.isHover() == true)
+                DrawTexture(breakRecord, 0, 50, WHITE);
+            else if (btn8.isHover() == true)
+                DrawTexture(gameOverOn, 180, 50, WHITE);
+            else
+                DrawTexture(gameOverOff, 180, 50, WHITE);
             EndDrawing();
-            if (btn4.update() == MOUSE_BUTTON_LEFT)
-                choice = 1;
             if (btn6.update() == MOUSE_BUTTON_LEFT)
-                choice = 2;
+                choice = 5;
+            if (btn8.update() == MOUSE_BUTTON_LEFT)
+                choice = 1;
         }
     }
     CloseWindow();
