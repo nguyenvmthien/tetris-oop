@@ -23,6 +23,7 @@ public:
     void EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS);
     void Home(int& choice);
     void Run();
+    void LeaderBoard(int& choice);
     int wWidth;
     int wHeight;
     Color backgroundColor;

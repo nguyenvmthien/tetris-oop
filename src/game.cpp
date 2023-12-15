@@ -268,8 +268,8 @@ void Game::WriteResultToFile()
 
 void Game::Guide(int& choice)
 {
-    Image image = LoadImage("img/huongdanchoi.png");
-    Texture2D huongdanImage = LoadTextureFromImage(image);
+    Image image = LoadImage("img/Guide.png");
+    Texture2D guide = LoadTextureFromImage(image);
     UnloadImage(image);
     ButtonO btn3("Home", 500, 200, font1);
 
@@ -277,7 +277,7 @@ void Game::Guide(int& choice)
     {
         BeginDrawing();
         ClearBackground(Color{43, 39, 57, 1});
-        DrawTexture(huongdanImage, 100, 135, WHITE);
+        DrawTexture(guide, 100, 135, WHITE);
         btn3.draw();
         EndDrawing();
         
@@ -287,7 +287,31 @@ void Game::Guide(int& choice)
             break;
         }
     }
-    UnloadTexture(huongdanImage);
+    UnloadTexture(guide);
+}
+
+void Game::LeaderBoard(int& choice)
+{
+    Image image = LoadImage("img/trophy.png");
+    Texture2D board = LoadTextureFromImage(image);
+    UnloadImage(image);
+    ButtonO btn3("Home", 500, 200, font1);
+
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+        ClearBackground(Color{43, 39, 57, 1});
+        DrawTexture(board, 100, 135, WHITE);
+        btn3.draw();
+        EndDrawing();
+        
+        if (btn3.update() == MOUSE_BUTTON_LEFT)
+        {
+            choice = 3;
+            break;
+        }
+    }
+    UnloadTexture(board);
 }
 
 double Game::updateInterval()
@@ -473,7 +497,7 @@ void Game::Home(int& choice)
     bool mouseOnText = 1;
     int framesCounter = 0;
 
-    Image image = LoadImage("img/TETRIS.png");
+    Image image = LoadImage("img/TETRIS1.png");
     Texture2D tetrisImage = LoadTextureFromImage(image);
     UnloadImage(image);
 
@@ -572,6 +596,7 @@ void Game::Run()
         }
         else if (choice == 2)
         {
+            LeaderBoard(choice);
             // BeginDrawing();
             // ClearBackground(PINK);
             // btn4.draw();
