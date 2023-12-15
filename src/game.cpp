@@ -55,7 +55,7 @@ void Game::LoadGameTexture()
     soundOff = LoadTextureFromImage(LoadImage("img/SoundOff.png"));
     aboutUs = LoadTextureFromImage(LoadImage("img/About.png"));
     guide = LoadTextureFromImage(LoadImage("img/Guide.png"));
-    logo = LoadTextureFromImage(LoadImage("img/logo.png"));
+    logo = LoadTextureFromImage(LoadImage("img/TETRISsmall.png"));
 }
 
 void Game::UnloadGameTexture()
@@ -247,6 +247,7 @@ void Game::LockBlock()
         gameOver = true;
         timePlayed = GetTime();
         WriteResultToFile();
+        getLeaderBoard();
     }
     nextBlock = GetRandomBlock();
     int rowsCleared = grid.ClearFullRows();
@@ -325,7 +326,7 @@ void Game::Guide(int &choice)
         ClearBackground(backgroundColor);
         btn3.draw();
         DrawTexture(homeImage4, 1065, 27, WHITE);
-        DrawTextEx(font1, "HOW TO PLAY", {400, 100}, 40, 5, PINK);
+        DrawTextEx(font1, "HOW TO PLAY", {300, 90}, 100, 5, PINK);
         DrawTexture(guide, 100, 200, WHITE);
         EndDrawing();
 
@@ -356,15 +357,17 @@ void  Game::getLeaderBoard() {
         topPlayers.push_back(player);
     }
     fclose(file);
-    std::sort(topPlayers.begin(), topPlayers.end(), [](Player a, Player b) {
+    std::sort(topPlayers.begin(), topPlayers.end(), [](const Player& a, const Player& b) {
+        if (a.score == b.score)
+            return a.timePlayed < b.timePlayed;
         return a.score > b.score;
     });
-    FILE *file2 = fopen("leader.txt", "w");
+    FILE *file2 = fopen("scores.txt", "w");
     if (file2 == NULL)
     {
         return;
     }
-    for (int i = 0; i < topPlayers.size(); i++)
+    for (int i = 0; i < topPlayers.size() && i < 3; i++)
     {
         fprintf(file2, "%s-", topPlayers[i].name);
         fprintf(file2, "%d-", topPlayers[i].score);
@@ -372,9 +375,27 @@ void  Game::getLeaderBoard() {
     }
     fclose(file2);
 }
+
+void PrintTopPlayer(const Player& p, float PosY, Font f, Color c)
+{
+    char nameText[10];
+    char scoreText[10];
+    char timePlayedText[10];
+
+    sprintf(nameText, "%s", p.name);
+    DrawTextEx(f, nameText, {350, PosY}, 50, 5, c);
+    sprintf(scoreText, "%d", p.score);
+    DrawTextEx(f, scoreText, {650, PosY}, 60, 5, c);
+    sprintf(timePlayedText, "%d", p.timePlayed);
+    DrawTextEx(f, timePlayedText, {900, PosY}, 60, 5, c);
+}
+
 void Game::LeaderBoard(int &choice)
 {
+    vector<float> PosY = {300, 450, 600};
+    vector<Color> c = {RED, {26, 31, 40, 255}, {255, 107, 1, 255}};
     ButtonO btn3(" ", 1020, 20, font1, 60, 6);
+
     getLeaderBoard();
     while (!WindowShouldClose())
     {
@@ -383,12 +404,16 @@ void Game::LeaderBoard(int &choice)
         BeginDrawing();
         ClearBackground(Color{43, 39, 57, 1});
         btn3.draw();
+
         DrawTexture(homeImage4, 1065, 27, WHITE);
-        DrawTextEx(font1, "LEADERBOARD", {350, 100}, 80, 5, PINK);
+        DrawTextEx(font1, "LEADERBOARD", {360, 80}, 80, 5, PINK);
         DrawTexture(trophyImage, 100, 200, WHITE);
-        DrawTextEx(font1, "Name", {400, 215}, 40, 5, BLACK);
+        DrawTextEx(font1, "Name", {350, 215}, 40, 5, BLACK);
         DrawTextEx(font1, "Score", {650, 215}, 40, 5, BLACK);
         DrawTextEx(font1, "Time", {900, 215}, 40, 5, BLACK);
+
+        for (int i = 0; i < topPlayers.size() && i < 3; i++)
+            PrintTopPlayer(topPlayers[i], PosY[i], font1, c[i]);
         EndDrawing();
 
         if (btn3.update() == MOUSE_BUTTON_LEFT)
@@ -419,8 +444,8 @@ bool Game::EventTriggered(double &lastUpdateTime)
 
 void Game::Over(int &choice)
 {
-    ButtonO btn3(" Play again ", 350, 400, font1, 60, 4);
-    ButtonO btn5("   Home  ", 350, 600, font1, 60, 4);
+    ButtonO btn3(" Play again ", 350, 420, font1, 60, 4);
+    ButtonO btn5("  Home  ", 400, 600, font1, 60, 4);
 
     while (!WindowShouldClose())
     {
@@ -460,13 +485,13 @@ void Game::Over(int &choice)
 
 void Game::CountDown()
 {
-    float numPosX = wWidth / 2 + 20;
-    int readyPosX = wWidth / 2 - 70;
+    float numPosX = wWidth / 2 + 10;
+    float numPosY = wHeight / 2 - 50;
 
     auto start = std::chrono::steady_clock::now();
     int countTime = 3;
 
-    while (!WindowShouldClose() && countTime != -1)
+    while (!WindowShouldClose() && countTime > -1)
     {
         if (!isMute)
             UpdateMusicStream(music);
@@ -476,7 +501,7 @@ void Game::CountDown()
 
         char countDown[10];
         sprintf(countDown, "%d", countTime);
-        DrawTextEx(font, countDown, {numPosX, 50}, 50, 4, YELLOW);
+        DrawTextEx(font, countDown, {numPosX, numPosY}, 150, 4, YELLOW);
         EndDrawing();
 
         auto end = std::chrono::steady_clock::now();
@@ -487,32 +512,29 @@ void Game::CountDown()
 
 void Game::GameInfo()
 {
-    DrawTextEx(font, "Score", {839, 417}, 40, 5, PINK);
-    DrawTextEx(font, "Next", {833, 99}, 40, 5, PINK);
-    DrawTextEx(font, "Line", {370, 460}, 40, 5, PINK);
-    DrawTextEx(font, "Name", {370, 99}, 40, 5, PINK);
-    DrawTextEx(font, "Interval", {100, 99}, 40, 5, PINK);
+    DrawTextEx(font, "Score", {100, 440}, 40, 5, PINK);
+    DrawTextEx(font, "Next", {850, 99}, 40, 5, PINK);
+    DrawTextEx(font, "Line", {900, 440}, 40, 5, PINK);
+    DrawTextEx(font, "Player", {100, 200}, 40, 5, PINK);
+    DrawTextEx(font, "Time", {900, 600}, 40, 5, PINK);
+    DrawTexture(logo, 50, 40, WHITE);
 
-    char timeplay[10];
-    sprintf(timeplay, "%d", timePlayed);
-    DrawTextEx(font, timeplay, {100, 300}, 40, 5, WHITE);
-
-    char intervalText[10];
-    sprintf(intervalText, "%.1f", updateInterval());
-    DrawTextEx(font, intervalText, {100, 146}, 40, 5, WHITE);
+    char timePlayedText[10];
+    sprintf(timePlayedText, "%d", timePlayed);
+    DrawTextEx(font, timePlayedText, {900, 660}, 70, 5, WHITE);
 
     char namePlayedText[10];
     sprintf(namePlayedText, "%s", namePlayer.c_str());
-    DrawTextEx(font, namePlayedText, {400, 146}, 40, 5, WHITE);
+    DrawTextEx(font, namePlayedText, {100, 260}, 70, 5, WHITE);
 
     char scoreText[10];
     sprintf(scoreText, "%d", score);
     Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
-    DrawTextEx(font, scoreText, {839 + 55 - textSize.x / 2, 460}, 40, 5, WHITE);
+    DrawTextEx(font, scoreText, {100, 500}, 70, 5, WHITE);
 
     char linesClearedText[10];
     sprintf(linesClearedText, "%d", linesCleared);
-    DrawTextEx(font, linesClearedText, {400, 511}, 40, 5, WHITE);
+    DrawTextEx(font, linesClearedText, {900, 500}, 70, 5, WHITE);
 
     DrawRectangleRounded({863, 146, 250, 200}, 0.5, 6, darkGrey);
     Draw();
