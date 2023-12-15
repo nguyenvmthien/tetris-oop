@@ -1,13 +1,14 @@
 #include "game.h"
 #include <random>
-
+#include <algorithm>
+#include <string.h>
 Game::Game()
 {
     wWidth = 1200;
     wHeight = 800;
     backgroundColor = {43, 39, 57, 1};
-    font = LoadFontEx("font/Inter-Bold.ttf", 64, 0, 0);
-    font1 = LoadFont("font/monogram.ttf");
+    font = LoadFontEx("Font/Inter-Bold.ttf", 64, 0, 0);
+    font1 = LoadFont("Font/monogram.ttf");
     grid = Grid();
     blocks = GetAllBlocks();
     currentBlock = GetRandomBlock();
@@ -21,10 +22,10 @@ Game::Game()
     lastUpdateTime = 0;
     isMute = 0;
     InitAudioDevice();
-    music = LoadMusicStream("sounds/music.mp3");
+    music = LoadMusicStream("Sounds/music.mp3");
     PlayMusicStream(music);
-    rotateSound = LoadSound("sounds/rotate.mp3");
-    clearSound = LoadSound("sounds/clear.mp3");
+    rotateSound = LoadSound("Sounds/rotate.mp3");
+    clearSound = LoadSound("Sounds/clear.mp3");
     LoadGameTexture();
 }
 
@@ -54,6 +55,7 @@ void Game::LoadGameTexture()
     soundOff = LoadTextureFromImage(LoadImage("img/SoundOff.png"));
     aboutUs = LoadTextureFromImage(LoadImage("img/About.png"));
     guide = LoadTextureFromImage(LoadImage("img/Guide.png"));
+    logo = LoadTextureFromImage(LoadImage("img/logo.png"));
 }
 
 void Game::UnloadGameTexture()
@@ -74,6 +76,7 @@ void Game::UnloadGameTexture()
     UnloadTexture(aboutUs);
     UnloadTexture(leaderBoard);
     UnloadTexture(guide);
+    UnloadTexture(logo);
 }
 
 Block Game::GetRandomBlock()
@@ -294,27 +297,29 @@ void Game::UpdateLinesCleared(int linesCleared)
 
 void Game::WriteResultToFile()
 {
-    // if (namePlayer != "")
-    // {
-        FILE *file = fopen("scores.txt", "a");
-        if (file == NULL)
-        {
-            return;
-        }
+    FILE *file = fopen("scores.txt", "a");
+    if (file == NULL)
+    {
+        return;
+    }
+    char name[namePlayer.size()];
+    strcpy(name, namePlayer.c_str());
+    if (strcmp(name, "") != 0)
+    {
         fprintf(file, "%s-", namePlayer.c_str());
         fprintf(file, "%d-", score);
         fprintf(file, "%d\n", timePlayed);
-        fclose(file);
-    // }
+    }
+    fclose(file);
 }
 
-void Game::Guide(int& choice)
+void Game::Guide(int &choice)
 {
-    ButtonO btn3(" ", 1020, 20, font1, 60, 6);   //short home
+    ButtonO btn3(" ", 1020, 20, font1, 60, 6); // short home
 
     while (!WindowShouldClose())
     {
-        if(!isMute)
+        if (!isMute)
             UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(backgroundColor);
@@ -323,7 +328,7 @@ void Game::Guide(int& choice)
         DrawTextEx(font1, "HOW TO PLAY", {400, 100}, 40, 5, PINK);
         DrawTexture(guide, 100, 200, WHITE);
         EndDrawing();
-        
+
         if (btn3.update() == MOUSE_BUTTON_LEFT)
         {
             choice = 3;
@@ -332,13 +337,48 @@ void Game::Guide(int& choice)
     }
 }
 
-void Game::LeaderBoard(int& choice)
+void  Game::getLeaderBoard() {
+    topPlayers.clear();
+    FILE *file = fopen("scores.txt", "r");
+    if (file == NULL)
+    {
+        return;
+    }
+    char name[10];
+    int score;
+    int timePlayed;
+    while (fscanf(file, "%[^-]-%d-%d\n", name, &score, &timePlayed) != EOF)
+    {
+        Player player;
+        strcpy(player.name, name);
+        player.score = score;
+        player.timePlayed = timePlayed;
+        topPlayers.push_back(player);
+    }
+    fclose(file);
+    std::sort(topPlayers.begin(), topPlayers.end(), [](Player a, Player b) {
+        return a.score > b.score;
+    });
+    FILE *file2 = fopen("leader.txt", "w");
+    if (file2 == NULL)
+    {
+        return;
+    }
+    for (int i = 0; i < topPlayers.size(); i++)
+    {
+        fprintf(file2, "%s-", topPlayers[i].name);
+        fprintf(file2, "%d-", topPlayers[i].score);
+        fprintf(file2, "%d\n", topPlayers[i].timePlayed);
+    }
+    fclose(file2);
+}
+void Game::LeaderBoard(int &choice)
 {
     ButtonO btn3(" ", 1020, 20, font1, 60, 6);
-
+    getLeaderBoard();
     while (!WindowShouldClose())
     {
-        if(!isMute)
+        if (!isMute)
             UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(Color{43, 39, 57, 1});
@@ -350,7 +390,7 @@ void Game::LeaderBoard(int& choice)
         DrawTextEx(font1, "Score", {650, 215}, 40, 5, BLACK);
         DrawTextEx(font1, "Time", {900, 215}, 40, 5, BLACK);
         EndDrawing();
-        
+
         if (btn3.update() == MOUSE_BUTTON_LEFT)
         {
             choice = 3;
@@ -366,8 +406,8 @@ double Game::updateInterval()
     return interval;
 }
 
-bool Game::EventTriggered(double& lastUpdateTime)
-{   
+bool Game::EventTriggered(double &lastUpdateTime)
+{
     double currentTime = GetTime();
     if (currentTime - lastUpdateTime >= updateInterval())
     {
@@ -377,14 +417,14 @@ bool Game::EventTriggered(double& lastUpdateTime)
     return false;
 }
 
-void Game::Over(int& choice)
+void Game::Over(int &choice)
 {
     ButtonO btn3(" Play again ", 350, 400, font1, 60, 4);
     ButtonO btn5("   Home  ", 350, 600, font1, 60, 4);
 
-    while(!WindowShouldClose())
+    while (!WindowShouldClose())
     {
-        if(!isMute)
+        if (!isMute)
             UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(backgroundColor);
@@ -420,20 +460,20 @@ void Game::Over(int& choice)
 
 void Game::CountDown()
 {
-    float numPosX = wWidth/2 + 20;
-    int readyPosX = wWidth/2 - 70;
+    float numPosX = wWidth / 2 + 20;
+    int readyPosX = wWidth / 2 - 70;
 
     auto start = std::chrono::steady_clock::now();
     int countTime = 3;
-    
-    while(!WindowShouldClose() && countTime != -1)
-    {   
-        if(!isMute)
+
+    while (!WindowShouldClose() && countTime != -1)
+    {
+        if (!isMute)
             UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(backgroundColor);
         GameInfo();
-       
+
         char countDown[10];
         sprintf(countDown, "%d", countTime);
         DrawTextEx(font, countDown, {numPosX, 50}, 50, 4, YELLOW);
@@ -451,7 +491,7 @@ void Game::GameInfo()
     DrawTextEx(font, "Next", {833, 99}, 40, 5, PINK);
     DrawTextEx(font, "Line", {370, 460}, 40, 5, PINK);
     DrawTextEx(font, "Name", {370, 99}, 40, 5, PINK);
-    DrawTextEx(font, "Interval", {100, 99}, 40, 5, PINK);   
+    DrawTextEx(font, "Interval", {100, 99}, 40, 5, PINK);
 
     char timeplay[10];
     sprintf(timeplay, "%d", timePlayed);
@@ -468,7 +508,7 @@ void Game::GameInfo()
     char scoreText[10];
     sprintf(scoreText, "%d", score);
     Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
-    DrawTextEx(font, scoreText, {839 + 55 - textSize.x/2, 460}, 40, 5, WHITE);
+    DrawTextEx(font, scoreText, {839 + 55 - textSize.x / 2, 460}, 40, 5, WHITE);
 
     char linesClearedText[10];
     sprintf(linesClearedText, "%d", linesCleared);
@@ -478,14 +518,14 @@ void Game::GameInfo()
     Draw();
 }
 
-void Game::Play(int& choice)
-{   
-    auto start = std::chrono::steady_clock::now();    
+void Game::Play(int &choice)
+{
+    auto start = std::chrono::steady_clock::now();
     while (!WindowShouldClose() && choice != 3 && choice != 6)
     {
         BeginDrawing();
         ClearBackground(backgroundColor);
-        if(!isMute)
+        if (!isMute)
             UpdateMusicStream(music);
 
         HandleInput();
@@ -507,7 +547,7 @@ void Game::Play(int& choice)
     }
 }
 
-void Game::EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS)
+void Game::EnterName(bool &mouseOnText, int &letterCount, int MAX_INPUT_CHARS)
 {
     if (mouseOnText)
     {
@@ -539,7 +579,7 @@ void Game::EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS)
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 }
 
-void Game::Home(int& choice)
+void Game::Home(int &choice)
 {
     ButtonO btn0("        Let's Play      ", 110, 350, font1, 50, 4);
     ButtonO btn1(" How To Play     ", 500, 475, font1, 50, 4);
@@ -549,7 +589,7 @@ void Game::Home(int& choice)
 
     while (!WindowShouldClose())
     {
-        if(!isMute)
+        if (!isMute)
             UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground(Color{43, 39, 57, 1});
@@ -559,9 +599,9 @@ void Game::Home(int& choice)
         btn2.draw();
         btnSound.draw();
         btnAbout.draw();
-        
+
         if (btnSound.update() == MOUSE_BUTTON_LEFT)
-                isMute = !isMute;
+            isMute = !isMute;
         if (isMute)
             DrawTexture(soundOff, 1050, 610, WHITE);
         else
@@ -573,10 +613,10 @@ void Game::Home(int& choice)
         DrawTexture(homeImage2, 900, 474, WHITE);
         DrawTexture(homeImage3, 150, 603, WHITE);
         if (btn0.isHover() == true || btn1.isHover() == true || btn2.isHover() == true)
-                DrawTexture(tetrisImage1, 200, 100, WHITE);
-            else
-                DrawTexture(tetrisImage2, 200, 100, WHITE);
-        
+            DrawTexture(tetrisImage1, 200, 100, WHITE);
+        else
+            DrawTexture(tetrisImage2, 200, 100, WHITE);
+
         EndDrawing();
 
         if (btn0.update() == MOUSE_BUTTON_LEFT)
@@ -597,7 +637,7 @@ void Game::Home(int& choice)
     }
 }
 
-void Game::GetReady(int& choice)
+void Game::GetReady(int &choice)
 {
     ButtonO btn4(" ", 1020, 20, font1, 60, 6); // HOME Ngắn
     ButtonO btn5("Start", 490, 600, font1, 60, 4);
@@ -608,13 +648,13 @@ void Game::GetReady(int& choice)
     int letterCount = 0;
     int MAX_INPUT_CHARS = 9;
 
-    while(!WindowShouldClose())
+    while (!WindowShouldClose())
     {
-        if(!isMute)
+        if (!isMute)
             UpdateMusicStream(music);
         BeginDrawing();
         ClearBackground({43, 39, 57, 1});
-        
+
         DrawRectangleRec(textBox, LIGHTGRAY);
         DrawTextEx(font1, "Enter your name", {200, 350}, 30, 5, PINK);
         DrawTextEx(font1, "Maximum 9 characters", {600, 510}, 30, 5, PINK);
@@ -675,7 +715,7 @@ void Game::Run()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
     int choice = 3;
-    
+
     while (!WindowShouldClose())
     {
         if (choice == 0)

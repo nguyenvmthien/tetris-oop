@@ -6,6 +6,11 @@
 #include "myGui.hpp"
 #include <chrono>
 
+struct Player {
+    char name[10];
+    int score;
+    int timePlayed;
+};
 class Game
 {
 public:
@@ -79,4 +84,7 @@ private:
     Texture2D aboutUs;
     Texture2D leaderBoard;
     Texture2D guide;
+    Texture2D logo;
+    std::vector<Player> topPlayers;
+    void getLeaderBoard();
 };
