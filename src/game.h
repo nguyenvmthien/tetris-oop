@@ -4,11 +4,15 @@
 #include <string>
 #include <iostream>
 #include "myGui.hpp"
+#include <chrono>
+
 class Game
 {
 public:
     Game();
     ~Game();
+    void LoadGameTexture();
+    void UnloadGameTexture();
     void Draw();
     void HandleInput();
     void MoveBlockDown();
@@ -16,13 +20,15 @@ public:
     void Guide(int& choice);
     double updateInterval();
     bool EventTriggered(double& lastUpdateTime);
-    int Over();
-    void GetReady();
+    void Over(int& choice);
+    void CountDown();
     void GameInfo();
     void Play(int& choice);
     void EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS);
     void Home(int& choice);
     void Run();
+    void LeaderBoard(int& choice);
+    void GetReady(int& choice);
     int wWidth;
     int wHeight;
     Color backgroundColor;
@@ -32,6 +38,7 @@ public:
     int score;
     int isReady;
     Music music;
+    bool isMute;
     int linesCleared;
     int timePlayed;
     std::string namePlayer;
@@ -56,4 +63,20 @@ private:
     Block nextBlock;
     Sound rotateSound;
     Sound clearSound;
+    Texture2D tetrisImage1;
+    Texture2D tetrisImage2;
+    Texture2D tetrisImage3;
+    Texture2D homeImage1;
+    Texture2D homeImage2;
+    Texture2D homeImage3;
+    Texture2D homeImage4;
+    Texture2D trophyImage;
+    Texture2D gameOverOn;
+    Texture2D gameOverOff;
+    Texture2D breakRecord;
+    Texture2D soundOn;
+    Texture2D soundOff;
+    Texture2D aboutUs;
+    Texture2D leaderBoard;
+    Texture2D guide;
 };
