@@ -16,14 +16,15 @@ public:
     void Guide(int& choice);
     double updateInterval();
     bool EventTriggered(double& lastUpdateTime);
-    int Over();
-    void GetReady();
+    void Over(int& choice);
+    void CountDown();
     void GameInfo();
     void Play(int& choice);
     void EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS);
     void Home(int& choice);
     void Run();
     void LeaderBoard(int& choice);
+    void GetReady(int& choice);
     int wWidth;
     int wHeight;
     Color backgroundColor;

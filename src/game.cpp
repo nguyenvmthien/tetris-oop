@@ -277,7 +277,7 @@ void Game::Guide(int& choice)
     UnloadImage(image);
     UnloadImage(home);
 
-    ButtonO btn3("", 1020, 20, font1, 60, 6);   //short home
+    ButtonO btn3(" ", 1020, 20, font1, 60, 6);   //short home
 
     while (!WindowShouldClose())
     {
@@ -302,16 +302,27 @@ void Game::Guide(int& choice)
 void Game::LeaderBoard(int& choice)
 {
     Image image = LoadImage("img/trophy.png");
+    Image home = LoadImage("img/home.png");
+
     Texture2D board = LoadTextureFromImage(image);
+    Texture2D homeIcon = LoadTextureFromImage(home);
+
     UnloadImage(image);
-    ButtonO btn3("Home", 500, 200, font1);
+    UnloadImage(home);
+
+    ButtonO btn3(" ", 1020, 20, font1, 60, 6);
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(Color{43, 39, 57, 1});
-        DrawTexture(board, 100, 135, WHITE);
         btn3.draw();
+        DrawTexture(homeIcon, 1065, 27, WHITE);
+        DrawTextEx(font1, "LEADERBOARD", {350, 100}, 80, 5, PINK);
+        DrawTexture(board, 100, 200, WHITE);
+        DrawTextEx(font1, "Name", {400, 215}, 40, 5, BLACK);
+        DrawTextEx(font1, "Score", {650, 215}, 40, 5, BLACK);
+        DrawTextEx(font1, "Time", {900, 215}, 40, 5, BLACK);
         EndDrawing();
         
         if (btn3.update() == MOUSE_BUTTON_LEFT)
@@ -341,10 +352,22 @@ bool Game::EventTriggered(double& lastUpdateTime)
     return false;
 }
 
-int Game::Over()
+void Game::Over(int& choice)
 {
-    ButtonO btn3("Home", 500, 200, font1);
-    ButtonO btn5("PLAY AGAIN", 100, 300, font1);
+    Image gameover1 = LoadImage("img/GameOverOn.png");
+    Image gameover2 = LoadImage("img/GameOverOff.png");
+    Image breakrecord = LoadImage("img/BreakTheRecord.png");
+
+    Texture2D gameOverOn = LoadTextureFromImage(gameover1);
+    Texture2D gameOverOff = LoadTextureFromImage(gameover2);
+    Texture2D breakRecord = LoadTextureFromImage(breakrecord);
+
+    UnloadImage(gameover1);
+    UnloadImage(gameover2);
+    UnloadImage(breakrecord);
+
+    ButtonO btn3(" Play again ", 350, 400, font1, 60, 4);
+    ButtonO btn5("   Home  ", 350, 600, font1, 60, 4);
 
     while(!WindowShouldClose())
     {
@@ -352,21 +375,33 @@ int Game::Over()
         ClearBackground(backgroundColor);
         btn3.draw();
         btn5.draw();
+
+        DrawTextEx(font1, "Score: ", {400, 300}, 60, 8, PINK);
+        if (btn3.isHover() == true)
+            DrawTexture(breakRecord, 0, 50, WHITE);
+        else if (btn5.isHover() == true)
+            DrawTexture(gameOverOn, 180, 50, WHITE);
+        else
+            DrawTexture(gameOverOff, 180, 50, WHITE);
         EndDrawing();
+
         if (btn3.update() == MOUSE_BUTTON_LEFT)
         {
-            return 3;
+            choice = 5;
+            break;
         }
         else if (btn5.update() == MOUSE_BUTTON_LEFT)
         {
-            return 0;
+            choice = 3;
+            break;
         }
-        DrawTextEx(font, "Game Over", {200, 400}, 40, 5, PINK);
-        // DrawTextEx(font, "Press R to restart", {200, 500}, 40, 5, PINK);
     }
+    UnloadTexture(gameOverOn);
+    UnloadTexture(gameOverOff);
+    UnloadTexture(breakRecord);
 }
 
-void Game::GetReady()
+void Game::CountDown()
 {
     float numPosX = wWidth/2 + 20;
     float readyPosX = wWidth/2 - 70;
@@ -500,19 +535,27 @@ void Game::EnterName(bool& mouseOnText, int& letterCount, int MAX_INPUT_CHARS)
 
 void Game::Home(int& choice)
 {
-    int MAX_INPUT_CHARS = 9;
-    int letterCount = 0;
-    Rectangle textBox = {600, 400, 255, 50};
-    bool mouseOnText = 1;
-    int framesCounter = 0;
+    Image image1 = LoadImage("img/TETRIS1.png");
+    Image image2 = LoadImage("img/TETRIS2.png");
+    Image letplay = LoadImage("img/letplay.png");
+    Image howtoplay = LoadImage("img/howtoplay.png");
+    Image leaderboard = LoadImage("img/leaderboard.png");
 
-    Image image = LoadImage("img/TETRIS1.png");
-    Texture2D tetrisImage = LoadTextureFromImage(image);
-    UnloadImage(image);
+    Texture2D tetrisImage1 = LoadTextureFromImage(image1);
+    Texture2D tetrisImage2 = LoadTextureFromImage(image2);
+    Texture2D homeImage1 = LoadTextureFromImage(letplay);
+    Texture2D homeImage2 = LoadTextureFromImage(howtoplay);
+    Texture2D homeImage3 = LoadTextureFromImage(leaderboard);
 
-    ButtonO btn0("Let's Play", 100, 200, font1);
-    ButtonO btn1("How To Play", 100, 400, font1);
-    ButtonO btn2("Leader Board", 100, 600, font1);
+    UnloadImage(image1);
+    UnloadImage(image2);
+    UnloadImage(letplay);
+    UnloadImage(howtoplay);
+    UnloadImage(leaderboard);
+
+    ButtonO btn0("        Let's Play      ", 110, 350, font1, 50, 4);
+    ButtonO btn1(" How To Play     ", 500, 475, font1, 50, 4);
+    ButtonO btn2("     Leader Board ", 110, 600, font1, 50, 4);
 
     while (!WindowShouldClose())
     {
@@ -522,50 +565,23 @@ void Game::Home(int& choice)
         btn0.draw();
         btn1.draw();
         btn2.draw();
-
-        // DrawTextEx(font1, "HOME", {839, 417}, 40, 5, PINK);
-        // myButtons[0]->draw();
-        // myButtons[1]->draw();
-        // myButtons[2]->draw();
-
-        if (IsMouseButtonPressed(0))
-        {
-            if (CheckCollisionPointRec(GetMousePosition(), textBox))
-                mouseOnText = true;
+        
+        DrawTextEx(font1, "HOME", {500, 50}, 60, 5, PINK);
+        DrawTexture(homeImage1, 200, 352, WHITE);
+        DrawTexture(homeImage2, 900, 474, WHITE);
+        DrawTexture(homeImage3, 150, 603, WHITE);
+        if (btn0.isHover() == true || btn1.isHover() == true || btn2.isHover() == true)
+                DrawTexture(tetrisImage1, 200, 100, WHITE);
             else
-                mouseOnText = false;
-        }
-        EnterName(mouseOnText, letterCount, MAX_INPUT_CHARS);
-        if (mouseOnText)
-            framesCounter++;
-        else
-            framesCounter = 0;
+                DrawTexture(tetrisImage2, 200, 100, WHITE);
         
-        DrawTexture(tetrisImage, 350, 100, WHITE);
-        // DrawTextEx(font, "Enter your name", {200, 400}, 40, 5, PINK);
-        // DrawTextEx(font, "Press Enter to start", {200, 500}, 40, 5, PINK);
-        // DrawTextEx(font, "Press H for help", {200, 600}, 40, 5, PINK);
-        
-        DrawRectangleRec(textBox, LIGHTGRAY);
-        if (mouseOnText)
-            DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
-        else
-            DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, DARKGRAY);
-
-        DrawText(namePlayer.c_str(), (int)textBox.x + 5, (int)textBox.y + 8, 40, MAROON);
-
-        if (mouseOnText)
-        {
-            if (letterCount < MAX_INPUT_CHARS)
-            {
-                if (((framesCounter / 20) % 2) == 0)
-                    DrawText("_", (int)textBox.x + 8 + MeasureText(namePlayer.c_str(), 40), (int)textBox.y + 12, 40, MAROON);
-            }
-        }
         EndDrawing();
-        if (IsKeyPressed(KEY_ENTER) || btn0.update() == MOUSE_BUTTON_LEFT)
+
+        cout << "in home " << choice << endl;
+
+        if (btn0.update() == MOUSE_BUTTON_LEFT)
         {
-            choice = 0;
+            choice = 5;
             break;
         }
         if (btn1.update() == MOUSE_BUTTON_LEFT)
@@ -579,25 +595,116 @@ void Game::Home(int& choice)
             break;
         }
     }
-    UnloadTexture(tetrisImage);
+    UnloadTexture(tetrisImage1);
+    UnloadTexture(tetrisImage2);
+    UnloadTexture(homeImage1);
+    UnloadTexture(homeImage2);
+    UnloadTexture(homeImage3);
+}
+
+void Game::GetReady(int& choice)
+{
+    ButtonO btn4(" ", 1020, 20, font1, 60, 6); // HOME Ngắn
+    ButtonO btn5("Start", 490, 600, font1, 60, 4);
+    Rectangle textBox = {200, 400, 800, 100};
+
+    Image home = LoadImage("img/home.png");
+    Image image1 = LoadImage("img/TETRIS1.png");
+    Image image2 = LoadImage("img/TETRIS2.png");
+
+    Texture2D homeImage4 = LoadTextureFromImage(home);
+    Texture2D tetrisImage1 = LoadTextureFromImage(image1);
+    Texture2D tetrisImage2 = LoadTextureFromImage(image2);
+    
+    UnloadImage(home);
+    UnloadImage(image1);
+    UnloadImage(image2);
+
+    bool mouseOnText = 1;
+    int framesCounter = 0;
+    int letterCount = 0;
+    int MAX_INPUT_CHARS = 9;
+
+    while(!WindowShouldClose())
+    {
+        BeginDrawing();
+        ClearBackground({43, 39, 57, 1});
+        
+        DrawRectangleRec(textBox, LIGHTGRAY);
+        DrawTextEx(font1, "Enter your name", {200, 350}, 30, 5, PINK);
+        DrawTextEx(font1, "Maximum 9 characters", {600, 510}, 30, 5, PINK);
+        DrawTextEx(font1, "GET READY", {450, 50}, 60, 5, PINK);
+
+        if (IsMouseButtonPressed(0))
+        {
+            if (CheckCollisionPointRec(GetMousePosition(), textBox))
+                mouseOnText = true;
+            else
+                mouseOnText = false;
+        }
+        EnterName(mouseOnText, letterCount, MAX_INPUT_CHARS);
+        if (mouseOnText)
+            framesCounter++;
+        else
+            framesCounter = 0;
+        if (mouseOnText)
+            DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
+        else
+            DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, DARKGRAY);
+
+        DrawText(namePlayer.c_str(), (int)textBox.x + 5, (int)textBox.y + 8 + 10, 60, MAROON);
+
+        if (mouseOnText)
+        {
+            if (letterCount < MAX_INPUT_CHARS)
+            {
+                if (((framesCounter / 20) % 2) == 0)
+                    DrawText("_", (int)textBox.x + 8 + MeasureText(namePlayer.c_str(), 60), (int)textBox.y + 15 + 10, 60, MAROON);
+            }
+        }
+
+        btn4.draw();
+        btn5.draw();
+        DrawTexture(homeImage4, 1065, 27, WHITE);
+
+        if (btn5.isHover() == true || btn4.isHover() == true)
+            DrawTexture(tetrisImage1, 200, 100, WHITE);
+        else
+            DrawTexture(tetrisImage2, 200, 100, WHITE);
+        EndDrawing();
+
+        if (btn4.update() == MOUSE_BUTTON_LEFT)
+        {
+            choice = 3;
+            break;
+        }
+        if (btn5.update() == MOUSE_BUTTON_LEFT || IsKeyPressed(KEY_ENTER))
+        {
+            choice = 0;
+            break;
+        }
+    }
+    UnloadTexture(homeImage4);
+    UnloadTexture(tetrisImage1);
+    UnloadTexture(tetrisImage2);
 }
 
 void Game::Run()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-
     int choice = 3;
     
     while (!WindowShouldClose())
     {
         if (choice == 0)
         {
-            GetReady();
+            CountDown();
             Play(choice);
         }
         else if (choice == 3)
         {
             Home(choice);
+            cout << "after home " << choice << endl;
         }
         else if (choice == 1)
         {
@@ -607,25 +714,13 @@ void Game::Run()
         {
             LeaderBoard(choice);
         }
-        // else if (choice == 5)
-        // {
-        //     BeginDrawing();
-        //     ClearBackground(BLUE);
-        //     btn4.draw();
-        //     btn7.draw();
-        //     DrawTextEx(font1, "PLAY GAME", {839, 417}, 40, 5, PINK);
-        //     EndDrawing();
-        //     if (btn4.update() == MOUSE_BUTTON_LEFT)
-        //         choice = 1;
-        //     if (btn7.update() == MOUSE_BUTTON_LEFT)
-        //     {
-        //         lose = 1;
-        //         choice = 6;
-        //     }
-        // }
+        else if (choice == 5)
+        {
+            GetReady(choice);
+        }
         else if (choice == 6)
         {
-            choice = Over();
+            Over(choice);
             Reset();
         }
     }
