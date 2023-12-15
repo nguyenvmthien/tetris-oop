@@ -14,5 +14,5 @@ const Color white = {255, 255, 255, 255};
 
 std::vector<Color> GetCellColors()
 {
-    return {darkGrey, green, red, orange, yellow, purple, cyan, white};
+    return {darkGrey, green, orange, yellow, white, cyan, purple, red};
 }
