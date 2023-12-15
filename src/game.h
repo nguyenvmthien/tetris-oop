@@ -42,10 +42,9 @@ private:
     void MoveBlockRight();
     Block GetRandomBlock();
     std::vector<Block> GetAllBlocks();
-    bool IsBlockOutside();
+    bool IsBlockOutside(Block block);
     void RotateBlock();
     void LockBlock();
-    bool BlockFits();
     bool BlockFits(Block block);
     void Reset();
     void UpdateScore(int linesCleared);
