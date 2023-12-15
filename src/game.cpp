@@ -377,6 +377,11 @@ void Game::Over(int& choice)
         btn5.draw();
 
         DrawTextEx(font1, "Score: ", {400, 300}, 60, 8, PINK);
+        char scoreText[10];
+        sprintf(scoreText, "%d", score);
+        Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
+        DrawTextEx(font1, scoreText, {650, 300}, 60, 5, YELLOW);
+
         if (btn3.isHover() == true)
             DrawTexture(breakRecord, 0, 50, WHITE);
         else if (btn5.isHover() == true)
@@ -406,7 +411,7 @@ void Game::CountDown()
     float numPosX = wWidth/2 + 20;
     float readyPosX = wWidth/2 - 70;
 
-    while(!WindowShouldClose())
+    while(!WindowShouldClose() && isReady < 300)
     {   
         UpdateMusicStream(music);
         BeginDrawing();
@@ -416,32 +421,22 @@ void Game::CountDown()
             DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, YELLOW);
         else if (isReady < 100)
         {
-            DrawTextEx(font, "Get Ready", {readyPosX, 50}, 50, 4, backgroundColor);
             DrawTextEx(font, "3", {numPosX, 50}, 50, 4, YELLOW);
         }
         else if (isReady < 150)
         {
-            DrawTextEx(font, "3", {numPosX, 50}, 50, 4, backgroundColor);
             DrawTextEx(font, "2", {numPosX, 50}, 50, 4, YELLOW);
         }
         else if (isReady < 200)
         {
-            DrawTextEx(font, "2", {numPosX, 50}, 50, 4, backgroundColor);
             DrawTextEx(font, "1", {numPosX, 50}, 50, 4, YELLOW);
         }
         else if (isReady < 250)
         {
-            DrawTextEx(font, "1", {numPosX, 50}, 50, 4, backgroundColor);
             DrawTextEx(font, "0", {numPosX, 50}, 50, 4, YELLOW);
-        }
-        else if (isReady < 300)
-        {
-            DrawTextEx(font, "0", {numPosX, 50}, 50, 4, backgroundColor);
         }
         EndDrawing();
         isReady++; 
-        if (isReady == 300)
-            break;
     }
 }
 
@@ -453,6 +448,10 @@ void Game::GameInfo()
     DrawTextEx(font, "Name", {370, 99}, 40, 5, PINK);
     DrawTextEx(font, "Interval", {100, 99}, 40, 5, PINK);   
 
+    char timeplay[10];
+    sprintf(timeplay, "%d", timePlayed);
+    DrawTextEx(font, timeplay, {100, 300}, 40, 5, WHITE);
+
     char intervalText[10];
     sprintf(intervalText, "%.1f", updateInterval());
     DrawTextEx(font, intervalText, {100, 146}, 40, 5, WHITE);
@@ -461,11 +460,9 @@ void Game::GameInfo()
     sprintf(namePlayedText, "%s", namePlayer.c_str());
     DrawTextEx(font, namePlayedText, {400, 146}, 40, 5, WHITE);
 
-    // DrawRectangleRounded({863, 482, 250, 100}, 1, 6, lightBlue);
     char scoreText[10];
     sprintf(scoreText, "%d", score);
     Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
-
     DrawTextEx(font, scoreText, {839 + 55 - textSize.x/2, 460}, 40, 5, WHITE);
 
     char linesClearedText[10];
@@ -478,6 +475,7 @@ void Game::GameInfo()
 
 void Game::Play(int& choice)
 {   
+    auto start = std::chrono::steady_clock::now();    
     while (!WindowShouldClose() && choice != 3 && choice != 6)
     {
         BeginDrawing();
@@ -498,6 +496,8 @@ void Game::Play(int& choice)
             GameInfo();
         }
         EndDrawing();
+        auto end = std::chrono::steady_clock::now();
+        timePlayed = std::chrono::duration_cast<chrono::seconds>(end - start).count();
     }
 }
 

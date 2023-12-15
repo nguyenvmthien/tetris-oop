@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 #include "myGui.hpp"
+#include <chrono>
+
 class Game
 {
 public:
